@@ -6,14 +6,33 @@
 
     <groupId>Laane.Sten</groupId>
     <artifactId>StockTracker</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
+    <repositories>
+    <repository>
+        <id>0001</id>
+        <name>alpha-vantage-java-wrapper</name>
+        <url>https://dl.bintray.com/patriques82/maven</url>
+    </repository>
+    </repositories>
     <dependencies>
         <dependency>
-            <groupId>com.yahoofinance-api</groupId>
-            <artifactId>YahooFinanceAPI</artifactId>
-            <version>3.14.0</version>
+            <groupId>org.patriques</groupId>
+            <artifactId>alphavantage4j</artifactId>
+            <version>1.4</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 
 </project>
