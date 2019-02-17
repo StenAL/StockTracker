@@ -6,7 +6,7 @@
 
     <groupId>Laane.Sten</groupId>
     <artifactId>StockTracker</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <repositories>
     <repository>
         <id>0001</id>
@@ -41,6 +41,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

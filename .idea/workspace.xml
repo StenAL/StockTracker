@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="de3e2013-e5b2-4495-80da-8e8c660e2403" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/stocktracker/CurrencyConverter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/stocktracker/StockInfoFetcher.java" afterDir="false" />
+    <list default="true" id="de3e2013-e5b2-4495-80da-8e8c660e2403" name="Default Changelist" comment="Added writing stock and currency data to">
+      <change afterPath="$PROJECT_DIR$/src/data/IVV_temp.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/data/USD_temp.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/data/USD_temp_XML.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/stocktracker/DataAggregator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/stocktracker/StockViewerGUI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/stocktracker/CurrencyConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/stocktracker/CurrencyConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/stocktracker/StockInfoFetcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/stocktracker/StockInfoFetcher.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -21,11 +26,8 @@
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider editor-type-id="MavenHelperPluginDependencyAnalyzer" />
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
-              <folding>
-                <element signature="n#build#0;n#project#0;n#!!top" />
-              </folding>
+            <state relative-caret-position="481">
+              <caret line="51" selection-start-line="51" selection-end-line="51" />
             </state>
           </provider>
         </entry>
@@ -34,10 +36,24 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/StockTracker.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="255">
-              <caret line="15" selection-start-line="15" selection-end-line="15" />
+              <caret line="15" column="33" selection-start-line="15" selection-start-column="33" selection-end-line="15" selection-end-column="33" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#169#170#0" expanded="true" />
+                <element signature="e#191#192#0" expanded="true" />
+                <element signature="e#513#514#0" expanded="true" />
+                <element signature="e#546#547#0" expanded="true" />
+                <element signature="e#678#679#0" expanded="true" />
+                <element signature="e#723#724#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/DataAggregator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="27" selection-start-line="2" selection-start-column="27" selection-end-line="2" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -45,8 +61,14 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/StockInfoFetcher.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="29" selection-start-line="2" selection-start-column="29" selection-end-line="2" selection-end-column="29" />
+            <state relative-caret-position="390">
+              <caret line="27" column="49" selection-start-line="27" selection-start-column="49" selection-end-line="27" selection-end-column="49" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#588#589#0" expanded="true" />
+                <element signature="e#618#619#0" expanded="true" />
+                <element signature="e#1987#2004#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -54,8 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/CurrencyConverter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="263">
-              <caret line="94" column="20" selection-start-line="94" selection-start-column="20" selection-end-line="94" selection-end-column="20" />
+            <state relative-caret-position="425">
+              <caret line="40" column="57" selection-start-line="40" selection-start-column="57" selection-end-line="40" selection-end-column="57" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#760#761#0" expanded="true" />
@@ -77,6 +99,9 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>parser</find>
+      <find>data.x</find>
+      <find>print</find>
+      <find>compil</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -90,6 +115,7 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/main/java/StockTracker.java" />
         <option value="$PROJECT_DIR$/src/main/java/stocktracker/StockTracker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/stocktracker/StockInfoFetcher.java" />
         <option value="$PROJECT_DIR$/src/main/java/stocktracker/CurrencyConverter.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
@@ -158,14 +184,6 @@
             <path>
               <item name="StockTracker" type="b2602c69:ProjectViewProjectNode" />
               <item name="StockTracker" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="stocktracker" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="StockTracker" type="b2602c69:ProjectViewProjectNode" />
-              <item name="StockTracker" type="462c0819:PsiDirectoryNode" />
               <item name="target" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -180,7 +198,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550400288714" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550410279567" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -203,7 +221,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.CurrencyConverter">
+  <component name="RunManager" selected="Application.StockTracker (1)">
     <configuration name="CurrencyConverter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="stocktracker.CurrencyConverter" />
       <module name="StockTracker" />
@@ -254,8 +272,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.CurrencyConverter" />
         <item itemvalue="Application.StockTracker (1)" />
+        <item itemvalue="Application.CurrencyConverter" />
         <item itemvalue="Application.StockTracker" />
         <item itemvalue="Application.StockTracker" />
       </list>
@@ -293,14 +311,20 @@
       <option name="project" value="LOCAL" />
       <updated>1550357892153</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added somewhat working currency convertor from ECB API">
+      <created>1550400383493</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1550400383493</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18230277" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18230277" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -309,20 +333,20 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49946696" visible="true" weight="0.19609967" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4989339" visible="true" weight="0.2524377" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32936078" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50053304" side_tool="true" weight="0.26218852" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5010661" side_tool="true" weight="0.19609967" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Messages" order="10" weight="0.32936078" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Maven" order="4" visible="true" weight="0.23560767" />
+      <window_info anchor="right" id="Maven" order="4" visible="true" weight="0.122068234" />
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
@@ -332,7 +356,8 @@
     <MESSAGE value="Added Maven support" />
     <MESSAGE value="Added API dependency" />
     <MESSAGE value="Fixed API dependency (remote repository)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed API dependency (remote repository)" />
+    <MESSAGE value="Added somewhat working currency convertor from ECB API" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added somewhat working currency convertor from ECB API" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Java.gitignore" />
@@ -355,27 +380,37 @@
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/patriques/alphavantage4j/1.4/alphavantage4j-1.4.jar!/org/patriques/output/timeseries/IntraDay.class" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/StockTracker.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/StockViewerGUI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" selection-start-line="15" selection-end-line="15" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="34">
+          <caret line="2" column="27" selection-start-line="2" selection-start-column="27" selection-end-line="2" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/DataAggregator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="27" selection-start-line="2" selection-start-column="27" selection-end-line="2" selection-end-column="27" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/StockInfoFetcher.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="29" selection-start-line="2" selection-start-column="29" selection-end-line="2" selection-end-column="29" />
+        <state relative-caret-position="390">
+          <caret line="27" column="49" selection-start-line="27" selection-start-column="49" selection-end-line="27" selection-end-column="49" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#588#589#0" expanded="true" />
+            <element signature="e#618#619#0" expanded="true" />
+            <element signature="e#1987#2004#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/CurrencyConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="94" column="20" selection-start-line="94" selection-start-column="20" selection-end-line="94" selection-end-column="20" />
+        <state relative-caret-position="425">
+          <caret line="40" column="57" selection-start-line="40" selection-start-column="57" selection-end-line="40" selection-end-column="57" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#760#761#0" expanded="true" />
@@ -384,14 +419,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/stocktracker/StockTracker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="33" selection-start-line="15" selection-start-column="33" selection-end-line="15" selection-end-column="33" />
+          <folding>
+            <element signature="e#169#170#0" expanded="true" />
+            <element signature="e#191#192#0" expanded="true" />
+            <element signature="e#513#514#0" expanded="true" />
+            <element signature="e#546#547#0" expanded="true" />
+            <element signature="e#678#679#0" expanded="true" />
+            <element signature="e#723#724#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider editor-type-id="MavenHelperPluginDependencyAnalyzer" />
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-          <folding>
-            <element signature="n#build#0;n#project#0;n#!!top" />
-          </folding>
+        <state relative-caret-position="481">
+          <caret line="51" selection-start-line="51" selection-end-line="51" />
         </state>
       </provider>
     </entry>
