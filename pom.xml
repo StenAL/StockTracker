@@ -6,7 +6,7 @@
 
     <groupId>Laane.Sten</groupId>
     <artifactId>StockTracker</artifactId>
-    <version>0.3</version>
+    <version>0.4.1</version>
     <repositories>
     <repository>
         <id>0001</id>
