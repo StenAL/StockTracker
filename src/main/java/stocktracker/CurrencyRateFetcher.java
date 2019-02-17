@@ -13,31 +13,35 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CurrencyConverter {
+public class CurrencyRateFetcher {
 
     private XMLParser xmlParser;
+    private String currencyCode;
 
     public static void main(String[] args)  {
-        CurrencyConverter converter = new CurrencyConverter();
-        converter.writeCurrencyInfo("USD");
+        CurrencyRateFetcher converter = new CurrencyRateFetcher();
+        converter.writeCurrencyInfo("USD", "2018-09-24");
     }
 
-    public CurrencyConverter()
+    public CurrencyRateFetcher()
     {
         xmlParser = new XMLParser();
     }
 
-    public void writeCurrencyInfo(String currencyCode) {
+    public void writeCurrencyInfo(String currencyCode, String firstDate) {
         //TODO: Add functionality to select startPeriod for currency
-        String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode + ".EUR.SP00.A?startPeriod=2018-02-16&detail=dataonly";
+        this.currencyCode = currencyCode;
+        String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
+                ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
         try {
-            xmlParser.downloadXMLFile(currencyCode, new URL(url_str));
-            List<String> dataList = xmlParser.parse(currencyCode, xmlParser.dest);
-            xmlParser.writeToTextFile(currencyCode, dataList);
+            xmlParser.downloadXMLFile(new URL(url_str));
+            List<String> dataList = xmlParser.parse(xmlParser.dest);
+            writeToTextFile(dataList);
             System.out.println("Fetching " + currencyCode + " done");
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,14 +49,28 @@ public class CurrencyConverter {
 
     }
 
+    private void writeToTextFile(List<String> dataList) {
+        String dest = System.getProperty("user.dir") + "\\src\\data\\" + currencyCode + "_temp.txt";
+        try {
+            FileWriter writer = new FileWriter(dest);
+            //writer.write("Generated: " + LocalDate.now().toString() + "\n");
+            for (String dataEntry: dataList) {
+                writer.write(dataEntry);
+                writer.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private class XMLParser
     {
         DOMParser parser;
 
         // destination directory!
-        String dest = "C:\\Users\\stenl\\Desktop\\jaava\\StockTracker\\src\\data";
+        String dest = System.getProperty("user.dir") + "\\src\\data";
 
-        private void downloadXMLFile(String currencyCode, URL url)  {
+        private void downloadXMLFile(URL url)  {
             try {
                 final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setDoInput(true);
@@ -63,13 +81,9 @@ public class CurrencyConverter {
                 //TODO: Unit testing - assert response code 200
                 System.out.println("Response code: " + connection.getResponseCode());
                 String readStream = readStream(connection.getInputStream());
-                // Give output for the command line
-                //System.out.println(readStream);
                 List<String> lines = Arrays.asList(readStream.split("\n"));
                 Path file = Paths.get(dest + "\\" + currencyCode + "_temp_XML.xml");
                 Files.write(file, lines, Charset.forName("UTF-8"));
-
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -81,8 +95,7 @@ public class CurrencyConverter {
          * https://www.mkyong.com/java/how-to-read-xml-file-in-java-dom-parser/
          * @param src
          */
-        public List<String> parse(String currencyCode, String src) {
-
+        public List<String> parse(String src) {
             try {
                 ArrayList<String> dataList = new ArrayList<>();
                 src += "\\" + currencyCode + "_temp_XML.xml";
@@ -96,21 +109,17 @@ public class CurrencyConverter {
                 doc.getDocumentElement().normalize();
 
                 NodeList nList = doc.getElementsByTagName("Obs");
-
                 System.out.println("----------------------------");
 
                 for (int temp = 0; temp < nList.getLength(); temp++) {
-
                     Node nNode = nList.item(temp);
-
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
                         Element eElement = (Element) nNode;
+
                         Element date = (Element) eElement.getElementsByTagName("ObsDimension").item(0);
                         Element exchangeRate = (Element) eElement.getElementsByTagName("ObsValue").item(0);
 
-                        //System.out.println("Date : " + date.getAttribute("value"));
-                        //System.out.println("Rate : " + exchangeRate.getAttribute("value") + "\n");
                         String line = date.getAttribute("value") + " " + exchangeRate.getAttribute("value") + "\n";
                         dataList.add(line);
                     }
@@ -121,6 +130,7 @@ public class CurrencyConverter {
             }
             return null;
         }
+
 
         private String readStream(InputStream in) {
             String newLine  = System.getProperty("line.separator");
@@ -134,19 +144,6 @@ public class CurrencyConverter {
                 e.printStackTrace();
             }
             return sb.toString();
-        }
-
-        private void writeToTextFile(String currencyCode, List<String> dataList) {
-            String dest = "C:\\Users\\stenl\\Desktop\\jaava\\StockTracker\\src\\data\\" + currencyCode + "_temp.txt";
-            try {
-                FileWriter writer = new FileWriter(dest);
-                for (String dataEntry: dataList) {
-                    writer.write(dataEntry);
-                    writer.flush();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }
