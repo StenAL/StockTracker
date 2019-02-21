@@ -22,6 +22,8 @@ public class CurrencyRateFetcher {
 
     private XMLParser xmlParser;
     private String currencyCode;
+    // destination directory!
+    private String dest;
 
     public static void main(String[] args)  {
         CurrencyRateFetcher converter = new CurrencyRateFetcher();
@@ -31,6 +33,7 @@ public class CurrencyRateFetcher {
     public CurrencyRateFetcher()
     {
         xmlParser = new XMLParser();
+        dest = System.getProperty("user.dir") + "\\src\\main\\resources\\";
     }
 
     public void writeCurrencyInfo(String currencyCode, String firstDate) {
@@ -40,7 +43,7 @@ public class CurrencyRateFetcher {
                 ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
         try {
             xmlParser.downloadXMLFile(new URL(url_str));
-            List<String> dataList = xmlParser.parse(xmlParser.dest);
+            List<String> dataList = xmlParser.parse(dest);
             writeToTextFile(dataList);
             System.out.println("Fetching " + currencyCode + " done");
         } catch (Exception e) {
@@ -50,7 +53,7 @@ public class CurrencyRateFetcher {
     }
 
     private void writeToTextFile(List<String> dataList) {
-        String dest = System.getProperty("user.dir") + "\\src\\data\\" + currencyCode + "_temp.txt";
+        String dest = this.dest + currencyCode + "_temp.txt";
         try {
             FileWriter writer = new FileWriter(dest);
             //writer.write("Generated: " + LocalDate.now().toString() + "\n");
@@ -66,9 +69,6 @@ public class CurrencyRateFetcher {
     private class XMLParser
     {
         DOMParser parser;
-
-        // destination directory!
-        String dest = System.getProperty("user.dir") + "\\src\\data";
 
         private void downloadXMLFile(URL url)  {
             try {
@@ -98,7 +98,7 @@ public class CurrencyRateFetcher {
         public List<String> parse(String src) {
             try {
                 ArrayList<String> dataList = new ArrayList<>();
-                src += "\\" + currencyCode + "_temp_XML.xml";
+                src += currencyCode + "_temp_XML.xml";
                 File fXmlFile = new File(src);
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

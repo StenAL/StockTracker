@@ -17,7 +17,7 @@ public class StockInfoFetcher {
 
     private static final String API_KEY = "NZ04YC2MOTE5AN4P";
     private static final int TIMEOUT = 3000;
-    private static String generated;
+    //private static String generated;
 
     public static void main(String[] args) {
         getData("IVV");
@@ -42,7 +42,7 @@ public class StockInfoFetcher {
             //TODO: Let user specify start date
             DailyAdjusted response = stockTimeSeries.dailyAdjusted(ticker, OutputSize.COMPACT);
             Map<String, String> metaData = response.getMetaData();
-            generated = metaData.get("3. Last Refreshed");
+            //generated = metaData.get("3. Last Refreshed");
             List<StockData> stockData = response.getStockData();
             stockData.forEach(stock -> {
                 dateCloses.put(stock.getDateTime().toLocalDate(), stock.getClose());
@@ -55,7 +55,7 @@ public class StockInfoFetcher {
         return null;
     }
     public static String writeData(Map data, String ticker) {
-        String filename = System.getProperty("user.dir") + "\\src\\data\\" + ticker + "_temp.txt";
+        String filename = System.getProperty("user.dir") + "\\src\\main\\resources\\" + ticker + "_temp.txt";
         Map<Integer, String> map = new TreeMap<Integer, String>(data);
         Set set2 = map.entrySet();
         Iterator iterator2 = set2.iterator();

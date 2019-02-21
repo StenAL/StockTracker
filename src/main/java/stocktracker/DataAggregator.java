@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class DataAggregator {
+    // TODO: Add workingDir field
     public static void main(String[] args) {
         test();
     }
@@ -24,7 +25,7 @@ public class DataAggregator {
      * @param ticker_currency
      */
     public static void aggregate(String ticker_currency) {
-        String workingDir = System.getProperty("user.dir") + "\\src\\data\\";
+        String workingDir = System.getProperty("user.dir") + "\\src\\main\\resources\\";
         String ticker = ticker_currency.split("_")[0];
         String currency = ticker_currency.split("_")[1];
         List<String> stockDates = new ArrayList<>();
@@ -77,6 +78,7 @@ public class DataAggregator {
                         stockRates.add(index, stockRates.get(index));
                     }
                 }
+                //TODO: Add actual logging for this
                 System.out.println(ticker + ": missing " + missing + " on " + date);
             }
             for (String date: aggregateDates) {
@@ -90,7 +92,7 @@ public class DataAggregator {
             }
 
             FileWriter writer = new FileWriter(System.getProperty("user.dir") +
-                    "\\src\\data\\" + ticker + "_" + currency + "_temp.txt");
+                    "\\src\\main\\resources\\" + ticker + "_" + currency + "_temp.txt");
             for (int i = 0; i < aggregateDates.size(); i++) {
                 String line = aggregateDates.get(i) + " " + stockRates.get(i) + " " + currencyRates.get(i) + "\n";
                 writer.write(line);
@@ -103,7 +105,7 @@ public class DataAggregator {
     }
 
     public static void aggregate(String[] ticker_currency) {
-        String workingDir = System.getProperty("user.dir") + "\\src\\data\\";
+        String workingDir = System.getProperty("user.dir") + "\\src\\main\\resources\\";
         for (String combination: ticker_currency) {
             aggregate(combination);
         }
@@ -125,7 +127,7 @@ public class DataAggregator {
             }
             for (String line: data) {
                 //System.out.println(line);
-                writer.write(line);
+                writer.write(line + "\n");
                 writer.flush();
             }
         }catch (Exception e) {
