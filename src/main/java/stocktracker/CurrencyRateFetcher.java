@@ -13,7 +13,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,37 +22,35 @@ public class CurrencyRateFetcher {
     private XMLParser xmlParser;
     private String currencyCode;
     // destination directory!
-    private String dest;
+    private static final String DEST = System.getProperty("user.dir") + "\\src\\main\\resources\\";
 
     public static void main(String[] args)  {
-        CurrencyRateFetcher converter = new CurrencyRateFetcher();
-        converter.writeCurrencyInfo("USD", "2018-09-24");
+        writeCurrencyInfo("USD", "2018-09-24");
     }
 
-    public CurrencyRateFetcher()
-    {
-        xmlParser = new XMLParser();
-        dest = System.getProperty("user.dir") + "\\src\\main\\resources\\";
-    }
+    public static void writeCurrencyInfo(String currencyCode, String firstDate) {
+        CurrencyRateFetcher fetcher = new CurrencyRateFetcher(currencyCode);
 
-    public void writeCurrencyInfo(String currencyCode, String firstDate) {
         //TODO: Add functionality to select startPeriod for currency
-        this.currencyCode = currencyCode;
         String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
                 ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
         try {
-            xmlParser.downloadXMLFile(new URL(url_str));
-            List<String> dataList = xmlParser.parse(dest);
-            writeToTextFile(dataList);
+            fetcher.xmlParser.downloadXMLFile(new URL(url_str));
+            List<String> dataList = fetcher.xmlParser.parse(DEST);
+            fetcher.writeToTextFile(dataList);
             System.out.println("Fetching " + currencyCode + " done");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private CurrencyRateFetcher(String currencyCode) {
+        this.currencyCode = currencyCode;
+        this.xmlParser = new XMLParser();
     }
 
     private void writeToTextFile(List<String> dataList) {
-        String dest = this.dest + currencyCode + "_temp.txt";
+        String dest = DEST + currencyCode + "_temp.txt";
         try {
             FileWriter writer = new FileWriter(dest);
             //writer.write("Generated: " + LocalDate.now().toString() + "\n");
@@ -68,8 +65,6 @@ public class CurrencyRateFetcher {
 
     private class XMLParser
     {
-        DOMParser parser;
-
         private void downloadXMLFile(URL url)  {
             try {
                 final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -82,7 +77,7 @@ public class CurrencyRateFetcher {
                 System.out.println("Response code: " + connection.getResponseCode());
                 String readStream = readStream(connection.getInputStream());
                 List<String> lines = Arrays.asList(readStream.split("\n"));
-                Path file = Paths.get(dest + "\\" + currencyCode + "_temp_XML.xml");
+                Path file = Paths.get(DEST + "\\" + currencyCode + "_temp_XML.xml");
                 Files.write(file, lines, Charset.forName("UTF-8"));
             } catch (Exception e) {
                 e.printStackTrace();

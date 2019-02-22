@@ -4,22 +4,13 @@ package stocktracker;
 //TODO: Add .exe somehow
 public class StockTracker {
 
-    private CurrencyRateFetcher converter;
-    public StockViewerGUI gui;
     public static final String VERSION = "0.X";
 
     public static void main(String[] args) {
-        StockTracker tracker = new StockTracker();
-        //StockViewerGUI.main(null);
-        tracker.runTest();
+        runTest();
     }
 
-    public static void runTestWithoutGui()
-    {
-
-    }
-
-    public void runTest()
+    public static void runTest()
     {
         System.out.println("$$$");
         writeStockData("QQQ");
@@ -30,38 +21,20 @@ public class StockTracker {
         aggregateData(new String[] {"IVV_USD", "QQQ_USD"});
         System.out.println("Files aggregated");
         System.out.println("Done");
-        if (gui != null)
-        gui.setStatusLabel("Done");
 
     }
 
-    public StockTracker()
+    public static String writeStockData(String ticker)
     {
-        gui = null;
-        converter = new CurrencyRateFetcher();
-    }
-
-    public void setGui(StockViewerGUI gui) {
-        this.gui = gui;
-    }
-
-    public String writeStockData(String ticker)
-    {
-        if (gui != null)
-            gui.setStatusLabel("Fetching stock " + ticker + " data..." );
         return StockInfoFetcher.getData(ticker);
     }
 
-    public void writeCurrencyData(String currencyCode, String firstdate) {
-        if (gui != null)
-            gui.setStatusLabel("Fetching " + currencyCode + " data..." );
-        converter.writeCurrencyInfo(currencyCode, firstdate);
+    public static void writeCurrencyData(String currencyCode, String firstdate) {
+        CurrencyRateFetcher.writeCurrencyInfo(currencyCode, firstdate);
     }
 
-    public void aggregateData(String[] ticker_currency)
+    public static void aggregateData(String[] ticker_currency)
     {
-        if (gui != null)
-            gui.setStatusLabel("Aggregating data..." );
         DataAggregator.aggregate(ticker_currency);
     }
 }

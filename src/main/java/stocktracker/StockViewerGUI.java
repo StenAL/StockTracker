@@ -13,8 +13,9 @@ import javafx.stage.Stage;
 
 import java.io.FileInputStream;
 
+//TODO: Add icons
+
 public class StockViewerGUI extends Application {
-    private StockTracker tracker;
     private Stage primaryStage;
     private Label statusLabel;
     private int width;
@@ -26,8 +27,6 @@ public class StockViewerGUI extends Application {
 
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        tracker = new StockTracker();
-        tracker.setGui(this);
         setupStartScene();
         primaryStage.show();
     }
@@ -45,7 +44,7 @@ public class StockViewerGUI extends Application {
         primaryStage.setScene(scene);
     }
 
-    public void setStatusLabel(String newProgress) {
+    private void setStatusLabel(String newProgress) {
         statusLabel.setText(newProgress);
     }
 
@@ -63,11 +62,12 @@ public class StockViewerGUI extends Application {
         newButton.setMaxSize(150, 20);
         newButton.setOnAction(event -> setupNewTrackerScene());
 
+        // Todo: Deactivate existingButton if no save/config found
         Button existingButton = new Button("$$$ Existing tracker $$$");
         existingButton.setPrefSize(150, 20);
         existingButton.setOnAction(event -> {
                 makeGraphScene();
-                //tracker.runTest();
+                //StockTracker.runTest();
         });
 
         VBox vBox = new VBox();
@@ -122,7 +122,7 @@ public class StockViewerGUI extends Application {
         contentPane.setSpacing(30);
         //contentPane.setAlignment(Pos.CENTER);
         vBox.getChildren().add(contentPane);
-        Scene scene = new Scene(vBox, 960, 540);
+        Scene scene = new Scene(vBox, width, height);
 
         primaryStage.setScene(scene);
 
@@ -140,17 +140,41 @@ public class StockViewerGUI extends Application {
         Menu helpMenu = new Menu("Help");
         MenuItem aboutItem = new MenuItem("About");
         aboutItem.setOnAction(event -> {
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            Label aboutLabel = new Label("Author: Sten Laane\nVersion: " + StockTracker.VERSION);
-            VBox vBox = new VBox(aboutLabel);
-            vBox.setAlignment(Pos.CENTER);
-            Scene aboutScene = new Scene(vBox, 200, 100);
-            stage.setScene(aboutScene);
-            stage.show();});
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("About StockTracker");
+            alert.setHeaderText(null); // Alerts have an optional header.
+            alert.setContentText("Author: Sten Laane\nVersion: " + StockTracker.VERSION);
+            alert.showAndWait();});
         helpMenu.getItems().add(aboutItem);
 
         menuBar.getMenus().addAll(fileMenu, helpMenu);
 
+    }
+
+    public void runTest()
+    {
+        writeStockData("QQQ");
+        String firstDate = writeStockData("IVV");
+        writeCurrencyData("USD", firstDate);
+        aggregateData(new String[] {"IVV_USD", "QQQ_USD"});
+        setStatusLabel("Done");
+
+    }
+
+    public String writeStockData(String ticker)
+    {
+        setStatusLabel("Fetching stock " + ticker + " data..." );
+        return StockTracker.writeStockData(ticker);
+    }
+
+    public void writeCurrencyData(String currencyCode, String firstdate) {
+        setStatusLabel("Fetching " + currencyCode + " data..." );
+        StockTracker.writeCurrencyData(currencyCode, firstdate);
+    }
+
+    public void aggregateData(String[] ticker_currency)
+    {
+        setStatusLabel("Aggregating data..." );
+        StockTracker.aggregateData(ticker_currency);
     }
 }
