@@ -62,9 +62,10 @@ public class StockViewerGUI extends Application {
         newButton.setMaxSize(150, 20);
         newButton.setOnAction(event -> setupNewTrackerScene());
 
-        // Todo: Deactivate existingButton if no save/config found
         Button existingButton = new Button("$$$ Existing tracker $$$");
         existingButton.setPrefSize(150, 20);
+        existingButton.setDisable(!FileManager.fileExists("\\src\\main\\resources\\existingData.txt"));
+        //existingButton.setDisable(true);
         existingButton.setOnAction(event -> {
                 makeGraphScene();
                 //StockTracker.runTest();

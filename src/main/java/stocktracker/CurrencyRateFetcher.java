@@ -1,6 +1,5 @@
 package stocktracker;
 
-import oracle.xml.parser.v2.DOMParser;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -37,7 +36,7 @@ public class CurrencyRateFetcher {
         try {
             fetcher.xmlParser.downloadXMLFile(new URL(url_str));
             List<String> dataList = fetcher.xmlParser.parse(DEST);
-            fetcher.writeToTextFile(dataList);
+            FileManager.writeList(DEST + currencyCode + "_temp.txt", dataList);
             System.out.println("Fetching " + currencyCode + " done");
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,20 +46,6 @@ public class CurrencyRateFetcher {
     private CurrencyRateFetcher(String currencyCode) {
         this.currencyCode = currencyCode;
         this.xmlParser = new XMLParser();
-    }
-
-    private void writeToTextFile(List<String> dataList) {
-        String dest = DEST + currencyCode + "_temp.txt";
-        try {
-            FileWriter writer = new FileWriter(dest);
-            //writer.write("Generated: " + LocalDate.now().toString() + "\n");
-            for (String dataEntry: dataList) {
-                writer.write(dataEntry);
-                writer.flush();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private class XMLParser
@@ -115,7 +100,7 @@ public class CurrencyRateFetcher {
                         Element date = (Element) eElement.getElementsByTagName("ObsDimension").item(0);
                         Element exchangeRate = (Element) eElement.getElementsByTagName("ObsValue").item(0);
 
-                        String line = date.getAttribute("value") + " " + exchangeRate.getAttribute("value") + "\n";
+                        String line = date.getAttribute("value") + " " + exchangeRate.getAttribute("value");
                         dataList.add(line);
                     }
                 }

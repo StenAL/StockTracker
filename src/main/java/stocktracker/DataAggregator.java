@@ -1,6 +1,5 @@
 package stocktracker;
 
-import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -91,14 +90,14 @@ public class DataAggregator {
                 System.out.println("Something went horrendously wrong :(");
             }
 
-            FileWriter writer = new FileWriter(System.getProperty("user.dir") +
-                    "\\src\\main\\resources\\" + ticker + "_" + currency + "_temp.txt");
+
+            String dest = System.getProperty("user.dir") + "\\src\\main\\resources\\" + ticker + "_" + currency + "_temp.txt";
+            List<String> writeList = new ArrayList<>();
             for (int i = 0; i < aggregateDates.size(); i++) {
-                String line = aggregateDates.get(i) + " " + stockRates.get(i) + " " + currencyRates.get(i) + "\n";
-                writer.write(line);
-                writer.flush();
-                //System.out.print(line);
+                writeList.add(aggregateDates.get(i) + " " + stockRates.get(i) + " " + currencyRates.get(i));
             }
+            FileManager.writeList(dest, writeList);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,7 +110,7 @@ public class DataAggregator {
         }
         List<String> data;
         try {
-            FileWriter writer = new FileWriter(workingDir + "\\aggregated_temp.txt");
+            String dest = workingDir + "\\aggregated_temp.txt";
             data = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency[0] + "_temp.txt"));
             for (int i = 0; i < data.size(); i++) {
                 String line = data.get(i);
@@ -125,11 +124,8 @@ public class DataAggregator {
                     data.set(j, data.get(j) + " ! " + stockPrice + " " + currencyRate);
                 }
             }
-            for (String line: data) {
-                //System.out.println(line);
-                writer.write(line + "\n");
-                writer.flush();
-            }
+            FileManager.writeList(dest, data);
+            FileManager.writeArray(workingDir + "\\existingData.txt", ticker_currency);
         }catch (Exception e) {
             e.printStackTrace();
         }

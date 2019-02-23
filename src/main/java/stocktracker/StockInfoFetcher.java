@@ -60,12 +60,12 @@ public class StockInfoFetcher {
             FileWriter writer = new FileWriter(filename);
             //writer.write("Generated: " + generated + "\n");
             String firstDate = null;
+            FileManager.newFile(filename);
             while (iterator2.hasNext()) {
                 Map.Entry<String, String> me2 = iterator2.next();
                 if (firstDate == null) {firstDate = me2.getKey();}
-                String writeLine = me2.getKey()+ " " + me2.getValue() + "\n";
-                writer.write(writeLine);
-                writer.flush();
+                String writeLine = me2.getKey()+ " " + me2.getValue();
+                FileManager.writeLine(filename, writeLine, true);
             }
             return firstDate;
         } catch (Exception e)
