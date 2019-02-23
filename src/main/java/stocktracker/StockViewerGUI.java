@@ -145,6 +145,13 @@ public class StockViewerGUI extends Application {
             alert.setHeaderText(null); // Alerts have an optional header.
             alert.setContentText("Author: Sten Laane\nVersion: " + StockTracker.VERSION);
             alert.showAndWait();});
+
+        MenuItem howToUseItem = new MenuItem("Getting started");
+        howToUseItem.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("How to use StockTracker");
+            alert.setContentText("***Insert tutorial here***");
+            alert.showAndWait();});
         helpMenu.getItems().add(aboutItem);
 
         menuBar.getMenus().addAll(fileMenu, helpMenu);

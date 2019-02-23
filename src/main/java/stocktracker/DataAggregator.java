@@ -109,7 +109,7 @@ public class DataAggregator {
         for (String combination: ticker_currency) {
             aggregate(combination);
         }
-        List<String> data = new ArrayList<>();
+        List<String> data;
         try {
             FileWriter writer = new FileWriter(workingDir + "\\aggregated_temp.txt");
             data = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency[0] + "_temp.txt"));
