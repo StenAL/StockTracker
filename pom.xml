@@ -6,7 +6,7 @@
 
     <groupId>Laane.Sten</groupId>
     <artifactId>StockTracker</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -32,6 +32,11 @@
             <groupId>oracle</groupId>
             <artifactId>xmlparserv2</artifactId>
             <version>9i</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfxtras</groupId>
+            <artifactId>jmetro</artifactId>
+            <version>5.2</version>
         </dependency>
     </dependencies>
     <build>
