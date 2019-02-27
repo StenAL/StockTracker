@@ -62,7 +62,7 @@ public class CurrencyRateFetcher {
                 System.out.println("Response code: " + connection.getResponseCode());
                 String readStream = readStream(connection.getInputStream());
                 List<String> lines = Arrays.asList(readStream.split("\n"));
-                Path file = Paths.get(DEST + "\\" + currencyCode + "_temp_XML.xml");
+                Path file = Paths.get(DEST + "\\" + currencyCode + "_XML_temp.xml");
                 Files.write(file, lines, Charset.forName("UTF-8"));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -78,7 +78,7 @@ public class CurrencyRateFetcher {
         public List<String> parse(String src) {
             try {
                 ArrayList<String> dataList = new ArrayList<>();
-                src += currencyCode + "_temp_XML.xml";
+                src += currencyCode + "_XML_temp.xml";
                 File fXmlFile = new File(src);
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

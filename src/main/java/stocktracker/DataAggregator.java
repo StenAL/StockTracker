@@ -12,8 +12,29 @@ public class DataAggregator {
         test();
     }
 
-    public static void test() {
-        aggregate(new String[] {"IVV_USD", "QQQ_USD"});
+    private static void test() {
+        calculateMoney(new String[] {"IVV_USD", "QQQ_USD"}, new String[] {"5", "10"});
+    }
+
+    public static void calculateMoney(String[] ticker_currency, String[] stockAmounts) {
+        aggregate(ticker_currency);
+        List<String> finalData = FileManager.readLines("src\\main\\resources\\aggregated_temp.txt");
+        List<String> dateMoney = new ArrayList<>();
+        for (String line: finalData) {
+            String[] components = line.split(" ! ");
+            String date = components[0];
+            double money = 0;
+            for (int i = 1; i < components.length; i++) {
+                double stockPrice = Double.parseDouble(components[i].split(" ")[0]);
+                double currencyRate = Double.parseDouble(components[i].split(" ")[1]);
+
+                //System.out.println(stockPrice + " " + currencyRate);
+                money += stockPrice/currencyRate * Double.parseDouble(stockAmounts[i-1]);
+            }
+            money = Math.round(money * 100D) / 100D;
+            dateMoney.add(date + " " + money);
+        }
+        FileManager.writeList("src\\main\\resources\\money.txt", dateMoney);
     }
 
     /**
@@ -34,14 +55,15 @@ public class DataAggregator {
         List<String> currencyRates = new ArrayList<>();
         List<String> stockRates = new ArrayList<>();
         try {
-            Files.lines(Paths.get(workingDir + ticker + "_temp.txt"))
-                    .forEach(line -> {stockDates.add(line.split(" ")[0]);
-                    stockRates.add(line.split(" ")[1]);
-                    });
+            for (String line: FileManager.readLines(workingDir + ticker + "_temp.txt")) {
+                stockDates.add(line.split(" ")[0]);
+                stockRates.add(line.split(" ")[1]);
+            }
 
-            Files.lines(Paths.get(workingDir + currency + "_temp.txt"))
-                    .forEach(line -> {currencyDates.add(line.split(" ")[0]);
-                        currencyRates.add(line.split(" ")[1]);});
+            for (String line: FileManager.readLines(workingDir + currency + "_temp.txt")) {
+                currencyDates.add(line.split(" ")[0]);
+                currencyRates.add(line.split(" ")[1]);
+            }
 
             for (String stockDate: stockDates) {
                 aggregateDates.add(stockDate);
@@ -58,34 +80,15 @@ public class DataAggregator {
                 String missing = date.split(" ")[1];
                 date = date.split(" ")[0];
                 if (missing.equals("C")) {
-                    currencyDates.add(date);
-                    Collections.sort(currencyDates);
-                    int index = currencyDates.indexOf(date);
-                    try {
-                        currencyRates.add(index, currencyRates.get(index-1));
-                    } catch (IndexOutOfBoundsException e) {
-                        currencyRates.add(index, currencyRates.get(index));
-                    }
+                    fillMissingDates(currencyDates, currencyRates, date);
                 }
                 else {
-                    stockDates.add(date);
-                    Collections.sort(stockDates);
-                    int index = stockDates.indexOf(date);
-                    try {
-                        stockRates.add(index, stockRates.get(index-1));
-                    } catch (IndexOutOfBoundsException e) {
-                        stockRates.add(index, stockRates.get(index));
-                    }
+                    fillMissingDates(stockDates, stockRates, date);
                 }
                 //TODO: Add actual logging for this
                 System.out.println(ticker + ": missing " + missing + " on " + date);
             }
-            for (String date: aggregateDates) {
-                if (!missingDates.contains(date)) {
-                    String line = "";
-                    line += date;
-                }
-            }
+
             if (aggregateDates.size() != currencyRates.size() || aggregateDates.size() != stockRates.size()) {
                 System.out.println("Something went horrendously wrong :(");
             }
@@ -103,6 +106,17 @@ public class DataAggregator {
         }
     }
 
+    private static void fillMissingDates(List<String> datesList, List<String> ratesList, String date) {
+        datesList.add(date);
+        Collections.sort(datesList);
+        int index = datesList.indexOf(date);
+        try {
+            ratesList.add(index, ratesList.get(index-1));
+        } catch (IndexOutOfBoundsException e) {
+            ratesList.add(index, ratesList.get(index));
+        }
+    }
+
     public static void aggregate(String[] ticker_currency) {
         String workingDir = System.getProperty("user.dir") + "\\src\\main\\resources\\";
         for (String combination: ticker_currency) {
@@ -110,11 +124,11 @@ public class DataAggregator {
         }
         List<String> data;
         try {
-            String dest = workingDir + "\\aggregated_temp.txt";
+            String dest = workingDir + "aggregated_temp.txt";
             data = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency[0] + "_temp.txt"));
             for (int i = 0; i < data.size(); i++) {
                 String line = data.get(i);
-                data.set(i, line.substring(0,11) + "! " + line.substring(12));
+                data.set(i, line.substring(0,11) + "! " + line.substring(11));
             }
             for (int i = 1; i < ticker_currency.length; i++) {
                 List<String> fileLines = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency[i] + "_temp.txt"));
@@ -125,10 +139,10 @@ public class DataAggregator {
                 }
             }
             FileManager.writeList(dest, data);
-            FileManager.writeArray(workingDir + "\\existingData.txt", ticker_currency);
         }catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
 }

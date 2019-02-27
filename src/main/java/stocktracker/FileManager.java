@@ -21,8 +21,11 @@ public class FileManager {
         exampleList.add("st");
 
         FileManager.writeList("a.txt", exampleList);
-        System.out.println(FileManager.fileExists("a.txt"));
-        System.out.println(FileManager.fileExists("b.txt"));
+        FileManager.deleteFiles("src\\main\\resources", "_temp");
+
+        System.out.println("pom.xml exists: " + FileManager.fileExists("pom.xml"));
+        System.out.println("b.txt exists: " + FileManager.fileExists("b.txt"));
+        System.out.println(readLines(".gitignore"));
     }
 
     public static void writeList(String dest, List<String> writeList) {
@@ -33,6 +36,25 @@ public class FileManager {
         }
     }
 
+    public static void deleteFiles(String dest, String suffix)
+    {
+        File dir = new File(dest);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                String fname = child.getName();
+                int pos = fname.lastIndexOf(".");
+                if (pos > 0) {
+                    fname = fname.substring(0, pos);
+                }
+                if (fname.endsWith(suffix)) {
+                    child.delete();
+                }
+
+            }
+        }
+    }
+
     public static void writeArray(String dest, Object[] writeArray) {
         boolean append = false;
         for (Object writeObject: writeArray) {
@@ -40,6 +62,17 @@ public class FileManager {
             writeLine(dest, writeLine, append);
             append = true;
         }
+    }
+
+    public static List<String> readLines(String dest) {
+        ArrayList<String> lines = new ArrayList<>();
+        try {
+            Files.lines(Paths.get(dest))
+                    .forEach(line -> lines.add(line));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lines;
     }
 
     public static void writeLine(String dest, String writeLine, boolean append) {
