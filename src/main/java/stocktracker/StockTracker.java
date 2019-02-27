@@ -1,22 +1,26 @@
 package stocktracker;
 
+import java.time.LocalDate;
+
 //TODO: Add javadoc comments
-// TODO: Keep old saves/data in Excel table
+//TODO: Keep old save configurations and data in Excel table to use API less and boost speed
 //TODO: Add .exe somehow
 public class StockTracker {
 
     public static final String VERSION = "0.X";
 
     public static void main(String[] args) {
+
         runTest();
     }
 
-    public static void runTest()
+    private static void runTest()
     {
         System.out.println("$$$");
-        writeStockData("QQQ");
-        String firstDate = writeStockData("IVV");
-        writeCurrencyData("USD", firstDate);
+        //writeData("IVV", "USD", LocalDate.of(2018, 9, 24));
+        writeData("IVV", "USD", LocalDate.now().minusDays(139));
+        writeData("QQQ", "USD", LocalDate.now().minusDays(139));
+
         System.out.println("Data fetching done");
         System.out.println("$$$");
         calculateMoney(new String[] {"IVV_USD", "QQQ_USD"}, new String[] {"5", "10"});
@@ -26,14 +30,11 @@ public class StockTracker {
 
     }
 
-    public static String writeStockData(String ticker)
-    {
-        return StockInfoFetcher.getData(ticker);
+    public static void writeData(String ticker, String currencyCode, LocalDate startDate) {
+        StockInfoFetcher.getData(ticker, startDate);
+        CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
     }
 
-    public static void writeCurrencyData(String currencyCode, String firstdate) {
-        CurrencyRateFetcher.writeCurrencyInfo(currencyCode, firstdate);
-    }
 
     public static void calculateMoney(String[] ticker_currency, String[] stockAmounts)
     {

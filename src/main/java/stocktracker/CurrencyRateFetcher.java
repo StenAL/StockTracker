@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,13 +25,12 @@ public class CurrencyRateFetcher {
     private static final String DEST = System.getProperty("user.dir") + "\\src\\main\\resources\\";
 
     public static void main(String[] args)  {
-        writeCurrencyInfo("USD", "2018-09-24");
+        writeCurrencyInfo("USD", LocalDate.of(2018, 9, 24));
     }
 
-    public static void writeCurrencyInfo(String currencyCode, String firstDate) {
+    public static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) {
         CurrencyRateFetcher fetcher = new CurrencyRateFetcher(currencyCode);
 
-        //TODO: Add functionality to select startPeriod for currency
         String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
                 ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
         try {

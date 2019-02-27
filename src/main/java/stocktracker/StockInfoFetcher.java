@@ -8,6 +8,7 @@ import org.patriques.output.timeseries.DailyAdjusted;
 import org.patriques.output.timeseries.data.StockData;
 
 import java.io.FileWriter;
+import java.time.LocalDate;
 import java.util.*;
 
 public class StockInfoFetcher {
@@ -17,48 +18,62 @@ public class StockInfoFetcher {
     //private static String generated;
 
     public static void main(String[] args) {
-        getData("IVV");
+        test();
     }
 
-    public static String getData(String ticker) {
-        Map<String, String> data = fetchData(ticker);
-        String firstDate = writeData(data, ticker);
+    private static void test() {
+        getData("IVV", LocalDate.now().minusDays(365));
+    }
+
+    public static void getData(String ticker, LocalDate startDate) {
+        Map<String, String> data = fetchData(ticker, startDate);
+        writeData(data, ticker);
 
         System.out.println("Fetcing " + ticker + " done");
-        return firstDate;
     }
 
-    public static Map<String, String> fetchData(String ticker)
+    public static Map<String, String> fetchData(String ticker, LocalDate startDate)
     {
         AlphaVantageConnector apiConnector = new AlphaVantageConnector(API_KEY, TIMEOUT);
         TimeSeries stockTimeSeries = new TimeSeries(apiConnector);
 
         try {
+            // Alpha Vantage has two data OutputSizes: COMPACT which returns the first 100
+            // stock data entries and FULL which returns all available stock data.
+            // 100 stock market days is equivalent to ~140 calendar days (actually
+            // a few more because of market holidays)
+            OutputSize size;
+            if (LocalDate.now().minusDays(140).isBefore(startDate) ) {
+                // startDate is in last 140 days
+                size = OutputSize.COMPACT;
+            }
+            else {
+                size = OutputSize.FULL;
+            }
             HashMap<String, String> dateCloses = new HashMap<>();
-            //TODO: On first program launch/100 days after last refresh change outputsize to full
-            //TODO: Let user specify start date
-            DailyAdjusted response = stockTimeSeries.dailyAdjusted(ticker, OutputSize.COMPACT);
+            DailyAdjusted response = stockTimeSeries.dailyAdjusted(ticker, size);
             //Map<String, String> metaData = response.getMetaData();
             //generated = metaData.get("3. Last Refreshed");
             List<StockData> stockData = response.getStockData();
             stockData.forEach(stock -> {
-                dateCloses.put("" + stock.getDateTime().toLocalDate(), "" + stock.getClose());
+                LocalDate entryDate = stock.getDateTime().toLocalDate();
+                if (entryDate.isAfter(startDate.minusDays(1))) {
+                    dateCloses.put("" + entryDate, "" + stock.getClose());
+                }
             });
             return dateCloses;
 
         } catch (AlphaVantageException e) {
             System.out.println("something went wrong");
+            return null;
         }
-        return null;
     }
-    public static String writeData(Map<String, String> data, String ticker) {
+    public static void writeData(Map<String, String> data, String ticker) {
         String filename = System.getProperty("user.dir") + "\\src\\main\\resources\\" + ticker + "_temp.txt";
         Map<String, String> map = new TreeMap<>(data);
         Set<Map.Entry<String, String>> set2 = map.entrySet();
         Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();
         try {
-            FileWriter writer = new FileWriter(filename);
-            //writer.write("Generated: " + generated + "\n");
             String firstDate = null;
             FileManager.newFile(filename);
             while (iterator2.hasNext()) {
@@ -67,12 +82,10 @@ public class StockInfoFetcher {
                 String writeLine = me2.getKey()+ " " + me2.getValue();
                 FileManager.writeLine(filename, writeLine, true);
             }
-            return firstDate;
         } catch (Exception e)
         {
             e.printStackTrace();
         }
-        return null;
     }
 }
 

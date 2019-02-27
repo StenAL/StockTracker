@@ -25,6 +25,7 @@ public class FileManager {
 
         System.out.println("pom.xml exists: " + FileManager.fileExists("pom.xml"));
         System.out.println("b.txt exists: " + FileManager.fileExists("b.txt"));
+        System.out.println("saved_data is empty: " + FileManager.emptyDirectory("src\\main\\resources\\saved_data"));
         System.out.println(readLines(".gitignore"));
     }
 
@@ -98,5 +99,10 @@ public class FileManager {
     public static boolean fileExists(String dest) {
         File file = new File(dest);
         return file.isFile();
+    }
+
+    public static boolean emptyDirectory(String dest) {
+        File directory = new File(dest);
+        return directory.list().length == 0;
     }
 }

@@ -1,19 +1,17 @@
 package stocktracker;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
+
+import java.time.LocalDate;
 
 //TODO: Add icons
 
@@ -50,8 +48,9 @@ public class StockViewerGUI extends Application {
         for (String line: FileManager.readLines("src\\main\\resources\\money.txt")) {
             String[] splitLine = line.split(" ");
             money = Double.parseDouble(splitLine[1]);
-            XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(splitLine[0], money);
-            dataPoint.setNode(new HoveredThresholdNode(money));
+            String date = splitLine[0];
+            XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(date, money);
+            dataPoint.setNode(new HoveredThresholdNode(date, money));
             series.getData().add(dataPoint);
         }
         lineChart.setCreateSymbols(false);
@@ -93,8 +92,7 @@ public class StockViewerGUI extends Application {
 
         Button existingButton = new Button("Existing tracker");
         existingButton.setPrefSize(150, 20);
-        existingButton.setDisable(!FileManager.fileExists("src\\main\\resources\\saved_data\\existingData.txt"));
-        //existingButton.setDisable(false);
+        existingButton.setDisable(FileManager.emptyDirectory("src\\main\\resources\\saved_data"));
         existingButton.setOnAction(event -> {
             //runTest();
             makeGraphScene();
@@ -188,46 +186,39 @@ public class StockViewerGUI extends Application {
 
     }
 
-    public void runTest()
+    private void runTest()
     {
-        writeStockData("QQQ");
-        String firstDate = writeStockData("IVV");
-        writeCurrencyData("USD", "2018-09-24");
+        writeData("IVV", "USD", LocalDate.now().minusDays(139));
+        writeData("QQQ", "USD", LocalDate.now().minusDays(139));
         aggregateData(new String[] {"IVV_USD", "QQQ_USD"}, new String[] {"5", "10"});
-        //deleteTempFiles();
         setStatusLabel("Ready...");
 
     }
 
-    public String writeStockData(String ticker)
-    {
-        setStatusLabel("Fetching stock " + ticker + " data..." );
-        return StockTracker.writeStockData(ticker);
+    private void writeData(String ticker, String currencyCode, LocalDate startDate) {
+        setStatusLabel("Fetching " + ticker + " data...");
+        StockTracker.writeData(ticker, currencyCode, startDate);
     }
 
-    public void writeCurrencyData(String currencyCode, String firstdate) {
-        setStatusLabel("Fetching " + currencyCode + " data..." );
-        StockTracker.writeCurrencyData(currencyCode, firstdate);
-    }
-
-    public void aggregateData(String[] ticker_currency, String[] stockAmounts)
+    private void aggregateData(String[] ticker_currency, String[] stockAmounts)
     {
         setStatusLabel("Aggregating data..." );
         StockTracker.calculateMoney(ticker_currency, stockAmounts);
     }
 
-    public void deleteTempFiles() {
+    private void deleteTempFiles() {
         StockTracker.deleteTempFiles();
     }
 
     /**
      * Extremely simplified version of https://stackoverflow.com/questions/14615590/javafx-linechart-hover-values
+     * Used to show values on graph when hovering over them
      */
     class HoveredThresholdNode extends StackPane {
-        HoveredThresholdNode(Number value) {
+        HoveredThresholdNode(String date, Number value) {
             setPrefSize(8, 8);
             setBackground(Background.EMPTY);
-            Tooltip tooltip = new Tooltip("" + value);
+            Tooltip tooltip = new Tooltip(date + ": " + value);
             Tooltip.install(this, tooltip);
         }
     }
