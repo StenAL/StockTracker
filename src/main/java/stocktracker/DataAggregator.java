@@ -13,10 +13,16 @@ public class DataAggregator {
     }
 
     private static void test() {
-        calculateMoney(new String[] {"IVV_USD", "QQQ_USD"}, new String[] {"5", "10"});
+        ArrayList<String> testList = new ArrayList<>();
+        testList.add("IVV_USD");
+        testList.add("QQQ_USD");
+        ArrayList<Number> testAmounts = new ArrayList<>();
+        testAmounts.add(5);
+        testAmounts.add(10);
+        calculateMoney(testList, testAmounts);
     }
 
-    public static void calculateMoney(String[] ticker_currency, String[] stockAmounts) {
+    public static void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts) {
         aggregate(ticker_currency);
         List<String> finalData = FileManager.readLines("src\\main\\resources\\aggregated_temp.txt");
         List<String> dateMoney = new ArrayList<>();
@@ -29,7 +35,7 @@ public class DataAggregator {
                 double currencyRate = Double.parseDouble(components[i].split(" ")[1]);
 
                 //System.out.println(stockPrice + " " + currencyRate);
-                money += stockPrice/currencyRate * Double.parseDouble(stockAmounts[i-1]);
+                money += stockPrice/currencyRate * stockAmounts.get(i-1).doubleValue();
             }
             money = Math.round(money * 100D) / 100D;
             dateMoney.add(date + " " + money);
@@ -117,7 +123,7 @@ public class DataAggregator {
         }
     }
 
-    public static void aggregate(String[] ticker_currency) {
+    public static void aggregate(ArrayList<String> ticker_currency) {
         String workingDir = System.getProperty("user.dir") + "\\src\\main\\resources\\";
         for (String combination: ticker_currency) {
             aggregate(combination);
@@ -125,13 +131,13 @@ public class DataAggregator {
         List<String> data;
         try {
             String dest = workingDir + "aggregated_temp.txt";
-            data = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency[0] + "_temp.txt"));
+            data = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency.get(0) + "_temp.txt"));
             for (int i = 0; i < data.size(); i++) {
                 String line = data.get(i);
                 data.set(i, line.substring(0,11) + "! " + line.substring(11));
             }
-            for (int i = 1; i < ticker_currency.length; i++) {
-                List<String> fileLines = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency[i] + "_temp.txt"));
+            for (int i = 1; i < ticker_currency.size(); i++) {
+                List<String> fileLines = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency.get(i) + "_temp.txt"));
                 for (int j = 0; j < fileLines.size(); j++) {
                     String stockPrice = fileLines.get(j).split(" ")[1];
                     String currencyRate = fileLines.get(j).split(" ")[2];

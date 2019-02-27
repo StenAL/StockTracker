@@ -1,6 +1,7 @@
 package stocktracker;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 //TODO: Add javadoc comments
 //TODO: Keep old save configurations and data in Excel table to use API less and boost speed
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 public class StockTracker {
 
     public static final String VERSION = "0.X";
+    public static final int MAX_STOCKS = 5;
 
     public static void main(String[] args) {
 
@@ -23,7 +25,13 @@ public class StockTracker {
 
         System.out.println("Data fetching done");
         System.out.println("$$$");
-        calculateMoney(new String[] {"IVV_USD", "QQQ_USD"}, new String[] {"5", "10"});
+        ArrayList<String> testList = new ArrayList<>();
+        testList.add("IVV_USD");
+        testList.add("QQQ_USD");
+        ArrayList<Number> testAmounts = new ArrayList<>();
+        testAmounts.add(5);
+        testAmounts.add(10);
+        calculateMoney(testList, testAmounts);
         //deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
@@ -36,13 +44,13 @@ public class StockTracker {
     }
 
 
-    public static void calculateMoney(String[] ticker_currency, String[] stockAmounts)
+    public static void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts)
     {
         DataAggregator.calculateMoney(ticker_currency, stockAmounts);
         boolean append = false;
-        for (int i = 0; i < ticker_currency.length; i++) {
+        for (int i = 0; i < ticker_currency.size(); i++) {
             FileManager.writeLine("src\\main\\resources\\saved_data\\existingData.txt",
-                    ticker_currency[i] + " " + stockAmounts[i], append);
+                    ticker_currency.get(i) + " " + stockAmounts.get(i), append);
             append = true;
         }
     }

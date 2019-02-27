@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 //TODO: Add icons
 
@@ -20,20 +21,22 @@ public class StockViewerGUI extends Application {
     private Label statusLabel;
     private int width;
     private int height;
+    private ArrayList<ExtendableTextField> stocksTracked;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     public void start(Stage primaryStage) {
+        stocksTracked = new ArrayList<>();
         this.primaryStage = primaryStage;
         setupStartScene();
         primaryStage.show();
     }
 
     private void makeGraphScene() {
-        VBox vBox = new VBox();
-        setupMenuBar(vBox);
+        VBox root = new VBox();
+        setupMenuBar(root);
 
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -65,14 +68,11 @@ public class StockViewerGUI extends Application {
         hBox.setAlignment(Pos.CENTER);
 
         Region region = new Region();
-        vBox.getChildren().addAll(lineChart, hBox, region, statusLabel);
+        root.getChildren().addAll(lineChart, hBox, region, statusLabel);
         VBox.setVgrow(region, Priority.ALWAYS);
 
 
-        Scene scene = new Scene(vBox, 960, 540);
-        new JMetro(JMetro.Style.LIGHT).applyTheme(scene);
-        vBox.requestFocus();
-        primaryStage.setScene(scene);
+        createScene(root);
     }
 
     private void setStatusLabel(String newProgress) {
@@ -98,7 +98,7 @@ public class StockViewerGUI extends Application {
             makeGraphScene();
         });
 
-        VBox vBox = new VBox();
+        VBox root = new VBox();
 
         BorderPane mainPane = new BorderPane();
 
@@ -117,42 +117,63 @@ public class StockViewerGUI extends Application {
 
         setStatusLabel("Ready...");
 
-        setupMenuBar(vBox);
+        setupMenuBar(root);
 
         Region region = new Region();
-        vBox.getChildren().addAll(mainPane, region, statusLabel);
+        root.getChildren().addAll(mainPane, region, statusLabel);
         VBox.setVgrow(region, Priority.ALWAYS);
 
-        Scene scene = new Scene(vBox, width, height);
-        new JMetro(JMetro.Style.LIGHT).applyTheme(scene);
-        // So the newButton isn't focused
-        vBox.requestFocus();
-        primaryStage.setScene(scene);
+        createScene(root);
     }
 
     private void setupNewTrackerScene() {
-        VBox vBox = new VBox();
-        setupMenuBar(vBox);
+        VBox root = new VBox();
+        setupMenuBar(root);
 
         Label startLabel = new Label("Start date:");
+
+        // DatePicker acts weird with JMetro. Sometimes randomly throws errors
+        // on calendar button click and breaks
         DatePicker startDate = new DatePicker();
+        startDate.setDayCellFactory(picker -> new DateCell() {
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                LocalDate today = LocalDate.now();
+
+                setDisable(empty || date.compareTo(today) > 0 );
+            }
+        });
+
+        startDate.setEditable(false);
         VBox startDateBox = new VBox(startLabel, startDate);
+
         startDateBox.setAlignment(Pos.CENTER);
 
-        Label endLabel = new Label("End date:");
-        DatePicker endDate = new DatePicker();
-        VBox endDateBox = new VBox(endLabel, endDate);
-        endDateBox.setAlignment(Pos.CENTER);
+        VBox inputDataBox = new VBox();
+        Label inputLabel = new Label("Stocks: ");
+        ExtendableTextField field = new ExtendableTextField();
+        field.setRoot(inputDataBox);
+        field.setMaxWidth(200);
+        field.setPromptText("ticker_currency");
+        inputDataBox.getChildren().addAll(inputLabel, field);
+        inputDataBox.setAlignment(Pos.CENTER);
 
-        //TextField stock1 = new TextField();
-        VBox contentPane = new VBox(startDateBox, endDateBox);
+        Button goButton = new Button("Go!");
+        goButton.setOnAction(e -> plotNewData(startDate.getValue()));
+
+        VBox contentPane = new VBox(startDateBox, inputDataBox, goButton);
         contentPane.setSpacing(30);
-        //contentPane.setAlignment(Pos.CENTER);
-        vBox.getChildren().add(contentPane);
-        Scene scene = new Scene(vBox, width, height);
-        new JMetro(JMetro.Style.LIGHT).applyTheme(scene);
-        primaryStage.setScene(scene);
+        contentPane.setAlignment(Pos.CENTER);
+        root.getChildren().add(contentPane);
 
+        createScene(root);
+    }
+
+    private void createScene(Region root) {
+        Scene scene = new Scene(root, width, height);
+        new JMetro(JMetro.Style.LIGHT).applyTheme(scene);
+        root.requestFocus();
+        primaryStage.setScene(scene);
     }
 
     private void setupMenuBar(Pane parent) {
@@ -186,11 +207,35 @@ public class StockViewerGUI extends Application {
 
     }
 
+    private void plotNewData(LocalDate startDate) {
+        ArrayList<String> dataList = new ArrayList<>();
+        for (ExtendableTextField field: stocksTracked) {
+            String data = field.getText();
+            if (data.length() > 0) {
+                writeData(data.split("_")[0], data.split("_")[1], startDate);
+                dataList.add(data);
+            }
+        }
+        ArrayList<Number> testAmounts = new ArrayList<>();
+        testAmounts.add(5);
+        testAmounts.add(10);
+        System.out.println(dataList);
+        System.out.println(testAmounts);
+        calculateMoney(dataList, testAmounts);
+        makeGraphScene();
+    }
+
     private void runTest()
     {
         writeData("IVV", "USD", LocalDate.now().minusDays(139));
         writeData("QQQ", "USD", LocalDate.now().minusDays(139));
-        aggregateData(new String[] {"IVV_USD", "QQQ_USD"}, new String[] {"5", "10"});
+        ArrayList<String> testList = new ArrayList<>();
+        testList.add("IVV_USD");
+        testList.add("QQQ_USD");
+        ArrayList<Number> testAmounts = new ArrayList<>();
+        testAmounts.add(5);
+        testAmounts.add(10);
+        calculateMoney(testList, testAmounts);
         setStatusLabel("Ready...");
 
     }
@@ -200,7 +245,7 @@ public class StockViewerGUI extends Application {
         StockTracker.writeData(ticker, currencyCode, startDate);
     }
 
-    private void aggregateData(String[] ticker_currency, String[] stockAmounts)
+    private void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts)
     {
         setStatusLabel("Aggregating data..." );
         StockTracker.calculateMoney(ticker_currency, stockAmounts);
@@ -214,13 +259,63 @@ public class StockViewerGUI extends Application {
      * Extremely simplified version of https://stackoverflow.com/questions/14615590/javafx-linechart-hover-values
      * Used to show values on graph when hovering over them
      */
-    class HoveredThresholdNode extends StackPane {
-        HoveredThresholdNode(String date, Number value) {
+    private class HoveredThresholdNode extends StackPane {
+        private HoveredThresholdNode(String date, Number value) {
             setPrefSize(8, 8);
             setBackground(Background.EMPTY);
             Tooltip tooltip = new Tooltip(date + ": " + value);
             Tooltip.install(this, tooltip);
         }
     }
+
+    private class ExtendableTextField extends TextField {
+        private ExtendableTextField previousField;
+        private ExtendableTextField nextField;
+        private Pane root;
+
+        private ExtendableTextField() {
+            super();
+            previousField = null;
+            nextField = null;
+            stocksTracked.add(this);
+            setUp();
+        }
+
+        private void setPreviousField(ExtendableTextField field) {
+            previousField = field;
+        }
+
+        private void setRoot(Pane root) {
+            this.root = root;
+        }
+        private void setUp() {
+            focusedProperty().addListener(e -> {
+                if (nextField == null && stocksTracked.size() < StockTracker.MAX_STOCKS) {
+                    if (previousField == null ) {
+                        makeNextField();
+                    }
+                    else if (previousField.getText().length() > 0) {
+                        makeNextField();
+                    }
+                }
+            });
+            textProperty().addListener(e -> {
+                if (getText().length() > 0) {
+                    nextField.setDisable(false);
+                }
+            });
+        }
+
+        private void makeNextField() {
+            nextField = new ExtendableTextField();
+            nextField.setRoot(root);
+            nextField.setPromptText(getPromptText());
+            nextField.setMaxWidth(getMaxWidth());
+            nextField.setPreviousField(this);
+            nextField.setDisable(true);
+            root.getChildren().add(nextField);
+        }
+    }
+
 
 }
