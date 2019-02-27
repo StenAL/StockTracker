@@ -11,6 +11,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -41,10 +42,10 @@ public class StockViewerGUI extends Application {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Date");
-        yAxis.setLabel("Ca$h");
+        yAxis.setLabel("Ca$h (€)");
         LineChart<String,Number> lineChart = new LineChart<>(xAxis,yAxis);
 
-        lineChart.setTitle("$$$");
+        lineChart.setTitle("€€€");
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         //series.setName("My portfolio");
         double money = 0;
@@ -151,11 +152,12 @@ public class StockViewerGUI extends Application {
 
         VBox inputDataBox = new VBox();
         Label inputLabel = new Label("Stocks: ");
-        ExtendableTextField field = new ExtendableTextField();
-        field.setRoot(inputDataBox);
-        field.setMaxWidth(200);
-        field.setPromptText("ticker_currency");
-        inputDataBox.getChildren().addAll(inputLabel, field);
+        inputDataBox.getChildren().addAll(inputLabel);
+        ExtendableTextField tickerCurrencyTextField = new ExtendableTextField(inputDataBox);
+        tickerCurrencyTextField.setMaxWidth(200);
+        tickerCurrencyTextField.setPromptText("ticker_currency");
+
+
         inputDataBox.setAlignment(Pos.CENTER);
 
         Button goButton = new Button("Go!");
@@ -166,6 +168,7 @@ public class StockViewerGUI extends Application {
         contentPane.setAlignment(Pos.CENTER);
         root.getChildren().add(contentPane);
 
+        //TODO: Write configuration settings to file
         createScene(root);
     }
 
@@ -181,9 +184,11 @@ public class StockViewerGUI extends Application {
         parent.getChildren().add(menuBar);
 
         Menu fileMenu = new Menu("File");
+        MenuItem newItem = new MenuItem("New");
+        newItem.setOnAction(event -> setupStartScene());
         MenuItem quitItem = new MenuItem("Quit");
         quitItem.setOnAction(event -> System.exit(0));
-        fileMenu.getItems().add(quitItem);
+        fileMenu.getItems().addAll(newItem, quitItem);
 
         Menu helpMenu = new Menu("Help");
         MenuItem aboutItem = new MenuItem("About");
@@ -209,19 +214,22 @@ public class StockViewerGUI extends Application {
 
     private void plotNewData(LocalDate startDate) {
         ArrayList<String> dataList = new ArrayList<>();
+        ArrayList<Number> amounts = new ArrayList<>();
         for (ExtendableTextField field: stocksTracked) {
             String data = field.getText();
             if (data.length() > 0) {
                 writeData(data.split("_")[0], data.split("_")[1], startDate);
+                try {
+                    amounts.add(NumberFormat.getInstance().parse(field.amountField.getText()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 dataList.add(data);
             }
         }
-        ArrayList<Number> testAmounts = new ArrayList<>();
-        testAmounts.add(5);
-        testAmounts.add(10);
         System.out.println(dataList);
-        System.out.println(testAmounts);
-        calculateMoney(dataList, testAmounts);
+        System.out.println(amounts);
+        calculateMoney(dataList, amounts);
         makeGraphScene();
     }
 
@@ -271,13 +279,19 @@ public class StockViewerGUI extends Application {
     private class ExtendableTextField extends TextField {
         private ExtendableTextField previousField;
         private ExtendableTextField nextField;
+        private HBox container;
         private Pane root;
+        private TextField amountField;
 
-        private ExtendableTextField() {
+        private ExtendableTextField(Pane root) {
             super();
             previousField = null;
             nextField = null;
+            container = new HBox();
+            amountField = new TextField();
+            container.setAlignment(Pos.CENTER);
             stocksTracked.add(this);
+            this.root = root;
             setUp();
         }
 
@@ -285,9 +299,6 @@ public class StockViewerGUI extends Application {
             previousField = field;
         }
 
-        private void setRoot(Pane root) {
-            this.root = root;
-        }
         private void setUp() {
             focusedProperty().addListener(e -> {
                 if (nextField == null && stocksTracked.size() < StockTracker.MAX_STOCKS) {
@@ -302,18 +313,24 @@ public class StockViewerGUI extends Application {
             textProperty().addListener(e -> {
                 if (getText().length() > 0) {
                     nextField.setDisable(false);
+                    nextField.amountField.setDisable(false);
+
                 }
             });
+            amountField = new TextField();
+            amountField.setMaxWidth(70);
+            amountField.setPromptText("Amount");
+            container.getChildren().addAll(this, amountField);
+            root.getChildren().addAll(container);
         }
 
         private void makeNextField() {
-            nextField = new ExtendableTextField();
-            nextField.setRoot(root);
+            nextField = new ExtendableTextField(root);
             nextField.setPromptText(getPromptText());
             nextField.setMaxWidth(getMaxWidth());
             nextField.setPreviousField(this);
             nextField.setDisable(true);
-            root.getChildren().add(nextField);
+            nextField.amountField.setDisable(true);
         }
     }
 
