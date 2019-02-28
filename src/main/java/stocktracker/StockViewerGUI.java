@@ -35,7 +35,7 @@ public class StockViewerGUI extends Application {
         primaryStage.show();
     }
 
-    private void makeGraphScene() {
+    private void makeGraphScene(boolean newData) {
         VBox root = new VBox();
         setupMenuBar(root);
 
@@ -49,7 +49,15 @@ public class StockViewerGUI extends Application {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         //series.setName("My portfolio");
         double money = 0;
-        for (String line: FileManager.readLines("src\\main\\resources\\money.txt")) {
+        String moneyFile;
+        if (newData) {
+            moneyFile = "src\\main\\resources\\money.txt";
+        }
+        else {
+            moneyFile = "src\\main\\resources\\saved_data\\save_money.txt";
+        }
+
+        for (String line: FileManager.readLines(moneyFile)) {
             String[] splitLine = line.split(" ");
             money = Double.parseDouble(splitLine[1]);
             String date = splitLine[0];
@@ -95,8 +103,8 @@ public class StockViewerGUI extends Application {
         existingButton.setPrefSize(150, 20);
         existingButton.setDisable(FileManager.emptyDirectory("src\\main\\resources\\saved_data"));
         existingButton.setOnAction(event -> {
-            //runTest();
-            makeGraphScene();
+            updateExistingData();
+            makeGraphScene(false);
         });
 
         VBox root = new VBox();
@@ -168,7 +176,6 @@ public class StockViewerGUI extends Application {
         contentPane.setAlignment(Pos.CENTER);
         root.getChildren().add(contentPane);
 
-        //TODO: Write configuration settings to file
         createScene(root);
     }
 
@@ -230,7 +237,8 @@ public class StockViewerGUI extends Application {
         System.out.println(dataList);
         System.out.println(amounts);
         calculateMoney(dataList, amounts);
-        makeGraphScene();
+        createSave(dataList, amounts);
+        makeGraphScene(true);
     }
 
     private void runTest()
@@ -245,12 +253,19 @@ public class StockViewerGUI extends Application {
         testAmounts.add(10);
         calculateMoney(testList, testAmounts);
         setStatusLabel("Ready...");
+    }
 
+    private void updateExistingData() {
+        StockTracker.updateSave();
     }
 
     private void writeData(String ticker, String currencyCode, LocalDate startDate) {
         setStatusLabel("Fetching " + ticker + " data...");
         StockTracker.writeData(ticker, currencyCode, startDate);
+    }
+
+    private static void createSave(ArrayList<String> dataList, ArrayList<Number> amountList) {
+        StockTracker.createSave(dataList, amountList);
     }
 
     private void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts)

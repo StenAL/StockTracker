@@ -26,6 +26,8 @@ public class FileManager {
         System.out.println("pom.xml exists: " + FileManager.fileExists("pom.xml"));
         System.out.println("b.txt exists: " + FileManager.fileExists("b.txt"));
         System.out.println("saved_data is empty: " + FileManager.emptyDirectory("src\\main\\resources\\saved_data"));
+        System.out.println("Empty director /main/java: " + FileManager.emptyDirectory("src\\main\\java"));
+        System.out.println("Empty director /test/java: " + FileManager.emptyDirectory("src\\test\\java"));
         System.out.println(readLines(".gitignore"));
     }
 
@@ -81,16 +83,6 @@ public class FileManager {
             FileWriter writer = new FileWriter(dest, append);
             writer.write(writeLine + "\n");
             writer.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void newFile(String fileDest)
-    {
-        try {
-            Files.newBufferedWriter(Paths.get(fileDest));
-
         } catch (Exception e) {
             e.printStackTrace();
         }

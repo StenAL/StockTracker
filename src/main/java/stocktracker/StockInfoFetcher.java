@@ -32,6 +32,19 @@ public class StockInfoFetcher {
         System.out.println("Fetcing " + ticker + " done");
     }
 
+    public static LocalDate getMostRecentDay() {
+        AlphaVantageConnector apiConnector = new AlphaVantageConnector(API_KEY, TIMEOUT);
+        TimeSeries stockTimeSeries = new TimeSeries(apiConnector);
+        try {
+            List<StockData> temp = stockTimeSeries.daily("IVV").getStockData();
+            LocalDate lastDate = temp.get(0).getDateTime().toLocalDate();
+            return lastDate;
+        }
+        catch (AlphaVantageException e) {
+            return LocalDate.now();
+        }
+    }
+
     public static Map<String, String> fetchData(String ticker, LocalDate startDate)
     {
         AlphaVantageConnector apiConnector = new AlphaVantageConnector(API_KEY, TIMEOUT);
@@ -75,12 +88,13 @@ public class StockInfoFetcher {
         Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();
         try {
             String firstDate = null;
-            FileManager.newFile(filename);
+            boolean append = false;
             while (iterator2.hasNext()) {
                 Map.Entry<String, String> me2 = iterator2.next();
                 if (firstDate == null) {firstDate = me2.getKey();}
                 String writeLine = me2.getKey()+ " " + me2.getValue();
-                FileManager.writeLine(filename, writeLine, true);
+                FileManager.writeLine(filename, writeLine, append);
+                append = true;
             }
         } catch (Exception e)
         {

@@ -8,6 +8,7 @@ import java.util.List;
 
 public class DataAggregator {
     // TODO: Add workingDir field
+    // TODO: Padding money and stock decimal places with zeroes
     public static void main(String[] args) {
         test();
     }
@@ -22,7 +23,7 @@ public class DataAggregator {
         calculateMoney(testList, testAmounts);
     }
 
-    public static void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts) {
+    public static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) {
         aggregate(ticker_currency);
         List<String> finalData = FileManager.readLines("src\\main\\resources\\aggregated_temp.txt");
         List<String> dateMoney = new ArrayList<>();
@@ -123,7 +124,7 @@ public class DataAggregator {
         }
     }
 
-    public static void aggregate(ArrayList<String> ticker_currency) {
+    public static void aggregate(List<String> ticker_currency) {
         String workingDir = System.getProperty("user.dir") + "\\src\\main\\resources\\";
         for (String combination: ticker_currency) {
             aggregate(combination);
