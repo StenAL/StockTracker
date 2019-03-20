@@ -76,7 +76,10 @@ public class StockViewerGUI extends Application {
         HBox hBox = new HBox();
         Label label = new Label("Total ca$h: ");
         TextField field = new TextField("" + money);
-        field.setEditable(false);
+        field.setDisable(true);
+        field.setStyle("-fx-background-color: white;" +
+                "-fx-text-fill: " + "darkgreen");
+        field.setAlignment(Pos.CENTER_RIGHT);
         hBox.getChildren().addAll(label, field);
         hBox.setAlignment(Pos.CENTER);
 
