@@ -104,6 +104,19 @@ public class CurrencyRateFetcher {
                         dataList.add(line);
                     }
                 }
+                for (int i = 0; i < dataList.size(); i++) {
+                    String entry = dataList.get(i);
+                    int count = -1;
+                    while (entry.split(" ")[1].equals("NaN")) {
+                        try {
+                            entry = entry.split(" ")[0] + " " + dataList.get(i+count).split(" ")[1];
+                            dataList.set(i, entry);
+                        } catch (IndexOutOfBoundsException e) {
+                            count = dataList.size()-i;
+                        }
+                        count--;
+                    }
+                }
                 return  dataList;
             } catch (Exception e) {
                 e.printStackTrace();

@@ -16,6 +16,7 @@ public class FileManager {
     private static void test()
     {
         ArrayList<String> exampleList = new ArrayList<>();
+        FileManager.writeLine("x.txt", "a", false);
         exampleList.add("asdasdasd");
         exampleList.add("daaddd");
         exampleList.add("st");

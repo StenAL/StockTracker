@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 //TODO: Add icons
+//TODO: Add progress bars?
 
 public class StockViewerGUI extends Application {
     private Stage primaryStage;
@@ -42,8 +44,10 @@ public class StockViewerGUI extends Application {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Date");
+        xAxis.setTickMarkVisible(false);
         yAxis.setLabel("Ca$h (€)");
         LineChart<String,Number> lineChart = new LineChart<>(xAxis,yAxis);
+        lineChart.getStylesheets().add("chart-style.css");
 
         lineChart.setTitle("€€€");
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -91,6 +95,7 @@ public class StockViewerGUI extends Application {
     private void setupStartScene()
     {
         primaryStage.setTitle("Stock tracker");
+        primaryStage.getIcons().add(new Image("icon.png"));
         statusLabel = new Label("");
         width = (int) Screen.getPrimary().getBounds().getWidth()/2;
         height = (int) Screen.getPrimary().getBounds().getHeight()/2;
@@ -201,6 +206,10 @@ public class StockViewerGUI extends Application {
         MenuItem aboutItem = new MenuItem("About");
         aboutItem.setOnAction(event -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            // https://stackoverflow.com/questions/27976345/how-do-you-set-the-icon-of-a-dialog-control-java-fx-java-8/27983567
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("icon.png"));
+
             alert.setTitle("About StockTracker");
             alert.setHeaderText(null); // Alerts have an optional header.
             alert.setContentText("Author: Sten Laane\nVersion: " + StockTracker.VERSION);
@@ -209,6 +218,8 @@ public class StockViewerGUI extends Application {
         MenuItem howToUseItem = new MenuItem("Getting started");
         howToUseItem.setOnAction(event -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("icon.png"));
             alert.setHeaderText(null); // Alerts have an optional header.
             alert.setTitle("How to use StockTracker");
             alert.setContentText("***Insert tutorial here***");
