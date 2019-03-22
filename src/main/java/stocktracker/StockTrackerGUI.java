@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 //TODO: Add progress bars?
 
-public class StockViewerGUI extends Application {
+public class StockTrackerGUI extends Application {
     private Stage primaryStage;
     private Label statusLabel;
     private int width;

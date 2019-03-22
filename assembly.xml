@@ -1,0 +1,26 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+
+    <id>zip</id>
+
+    <formats>
+        <format>
+            zip
+        </format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <outputDirectory></outputDirectory>
+            <directory>${project.build.directory}</directory>
+            <!--To include single file into the zip -->
+            <includes>
+                <include>${project.artifactId}*.exe</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+</assembly>
