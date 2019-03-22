@@ -12,6 +12,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -55,10 +56,10 @@ public class StockViewerGUI extends Application {
         double money = 0;
         String moneyFile;
         if (newData) {
-            moneyFile = "src\\main\\resources\\money.txt";
+            moneyFile = StockTracker.PATH + "money.txt";
         }
         else {
-            moneyFile = "src\\main\\resources\\saved_data\\save_money.txt";
+            moneyFile = StockTracker.PATH + "save_money.txt";
         }
 
         for (String line: FileManager.readLines(moneyFile)) {
@@ -109,7 +110,7 @@ public class StockViewerGUI extends Application {
 
         Button existingButton = new Button("Existing tracker");
         existingButton.setPrefSize(150, 20);
-        existingButton.setDisable(FileManager.emptyDirectory("src\\main\\resources\\saved_data"));
+        //existingButton.setDisable(FileManager.emptyDirectory("src\\main\\resources\\saved_data"));
         existingButton.setOnAction(event -> {
             updateExistingData();
             makeGraphScene(false);
@@ -131,8 +132,15 @@ public class StockViewerGUI extends Application {
         centerNode.getChildren().addAll(newButton, existingButton);
         centerNode.setAlignment(Pos.CENTER);
         mainPane.setCenter(centerNode);
+        String path = StockTracker.PATH;
+        try {
+            String asd = new File(path).getParentFile().toString();
+            File x = new File(asd + "/axx.txt");
+            boolean noSaves = x.createNewFile();
+        } catch (Exception e) {}
 
-        setStatusLabel("Ready...");
+
+        setStatusLabel("Ready..." + path);
 
         setupMenuBar(root);
 

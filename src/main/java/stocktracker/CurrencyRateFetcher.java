@@ -21,8 +21,6 @@ public class CurrencyRateFetcher {
 
     private XMLParser xmlParser;
     private String currencyCode;
-    // destination directory!
-    private static final String DEST = System.getProperty("user.dir") + "\\src\\main\\resources\\";
 
     public static void main(String[] args)  {
         writeCurrencyInfo("USD", LocalDate.of(2018, 9, 24));
@@ -35,8 +33,8 @@ public class CurrencyRateFetcher {
                 ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
         try {
             fetcher.xmlParser.downloadXMLFile(new URL(url_str));
-            List<String> dataList = fetcher.xmlParser.parse(DEST);
-            FileManager.writeList(DEST + currencyCode + "_temp.txt", dataList);
+            List<String> dataList = fetcher.xmlParser.parse(StockTracker.PATH);
+            FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.txt", dataList);
             System.out.println("Fetching " + currencyCode + " done");
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +60,7 @@ public class CurrencyRateFetcher {
                 System.out.println("Response code: " + connection.getResponseCode());
                 String readStream = readStream(connection.getInputStream());
                 List<String> lines = Arrays.asList(readStream.split("\n"));
-                Path file = Paths.get(DEST + "\\" + currencyCode + "_XML_temp.xml");
+                Path file = Paths.get(StockTracker.PATH + currencyCode + "_XML_temp.xml");
                 Files.write(file, lines, Charset.forName("UTF-8"));
             } catch (Exception e) {
                 e.printStackTrace();

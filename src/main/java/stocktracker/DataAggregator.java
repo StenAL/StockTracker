@@ -25,7 +25,7 @@ public class DataAggregator {
 
     public static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) {
         aggregate(ticker_currency);
-        List<String> finalData = FileManager.readLines("src\\main\\resources\\aggregated_temp.txt");
+        List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.txt");
         List<String> dateMoney = new ArrayList<>();
         for (String line: finalData) {
             String[] components = line.split(" ! ");
@@ -41,7 +41,7 @@ public class DataAggregator {
             money = Math.round(money * 100D) / 100D;
             dateMoney.add(date + " " + money);
         }
-        FileManager.writeList("src\\main\\resources\\money.txt", dateMoney);
+        FileManager.writeList(StockTracker.PATH + "money.txt", dateMoney);
     }
 
     /**
@@ -52,7 +52,7 @@ public class DataAggregator {
      * @param ticker_currency
      */
     public static void aggregate(String ticker_currency) {
-        String workingDir = System.getProperty("user.dir") + "\\src\\main\\resources\\";
+        String workingDir = StockTracker.PATH;
         String ticker = ticker_currency.split("_")[0];
         String currency = ticker_currency.split("_")[1];
         List<String> stockDates = new ArrayList<>();
@@ -98,10 +98,11 @@ public class DataAggregator {
 
             if (aggregateDates.size() != currencyRates.size() || aggregateDates.size() != stockRates.size()) {
                 System.out.println("Something went horrendously wrong :(");
+                throw new Exception();
             }
 
 
-            String dest = System.getProperty("user.dir") + "\\src\\main\\resources\\" + ticker + "_" + currency + "_temp.txt";
+            String dest = StockTracker.PATH + ticker + "_" + currency + "_temp.txt";
             List<String> writeList = new ArrayList<>();
             for (int i = 0; i < aggregateDates.size(); i++) {
                 writeList.add(aggregateDates.get(i) + " " + stockRates.get(i) + " " + currencyRates.get(i));
@@ -125,14 +126,14 @@ public class DataAggregator {
     }
 
     public static void aggregate(List<String> ticker_currency) {
-        String workingDir = System.getProperty("user.dir") + "\\src\\main\\resources\\";
+        String workingDir = StockTracker.PATH;
         for (String combination: ticker_currency) {
             aggregate(combination);
         }
         List<String> data;
         try {
             String dest = workingDir + "aggregated_temp.txt";
-            data = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency.get(0) + "_temp.txt"));
+            data = Files.readAllLines(Paths.get(workingDir + "/" + ticker_currency.get(0) + "_temp.txt"));
             for (int i = 0; i < data.size(); i++) {
                 String line = data.get(i);
                 data.set(i, line.substring(0,11) + "! " + line.substring(11));

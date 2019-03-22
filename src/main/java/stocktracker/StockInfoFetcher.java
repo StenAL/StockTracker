@@ -23,6 +23,8 @@ public class StockInfoFetcher {
 
     private static void test() {
         getData("IVV", LocalDate.now().minusDays(365));
+        getData("QQQ", LocalDate.now().minusDays(365));
+
     }
 
     public static void getData(String ticker, LocalDate startDate) {
@@ -82,7 +84,8 @@ public class StockInfoFetcher {
         }
     }
     public static void writeData(Map<String, String> data, String ticker) {
-        String filename = System.getProperty("user.dir") + "\\src\\main\\resources\\" + ticker + "_temp.txt";
+        String filename = StockTracker.PATH + ticker + "_temp.txt";
+        System.out.println(filename);
         Map<String, String> map = new TreeMap<>(data);
         Set<Map.Entry<String, String>> set2 = map.entrySet();
         Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();

@@ -1,5 +1,8 @@
 package stocktracker;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,11 +15,23 @@ public class StockTracker {
 
     public static final String VERSION = "0.X";
     public static final int MAX_STOCKS = 5;
+    public static String PATH;
+
+    static {
+        try {
+            PATH = URLDecoder.decode(new File(StockTracker.class.getProtectionDomain().getCodeSource().getLocation().getPath())
+                        .getParent() + "/", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            PATH = null;
+        }
+    }
+
 
     public static void main(String[] args) {
 
-        //runNewTest();
-        runExistingTest();
+        runNewTest();
+        //runExistingTest();
     }
 
     private static void runNewTest()
@@ -55,15 +70,15 @@ public class StockTracker {
         boolean append = false;
         for (int i = 0; i < nameList.size(); i++) {
             String line = nameList.get(i) + " " + amountList.get(i);
-            FileManager.writeLine("src\\main\\resources\\saved_data\\save_config.txt", line, append);
+            FileManager.writeLine(PATH + "save_config.txt", line, append);
             append = true;
         }
-        List<String> dataList = FileManager.readLines("src\\main\\resources\\aggregated_temp.txt");
-        List<String> moneyList = FileManager.readLines("src\\main\\resources\\money.txt");
+        List<String> dataList = FileManager.readLines(PATH + "aggregated_temp.txt");
+        List<String> moneyList = FileManager.readLines(PATH + "money.txt");
         append = false;
         for (int i = 0; i < dataList.size(); i++) {
-            FileManager.writeLine("src\\main\\resources\\saved_data\\save_data.txt", dataList.get(i), append);
-            FileManager.writeLine("src\\main\\resources\\saved_data\\save_money.txt", moneyList.get(i), append);
+            FileManager.writeLine(PATH + "save_data.txt", dataList.get(i), append);
+            FileManager.writeLine(PATH + "save_money.txt", moneyList.get(i), append);
             append = true;
         }
     }
