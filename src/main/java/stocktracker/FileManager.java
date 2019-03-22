@@ -21,7 +21,7 @@ public class FileManager {
         exampleList.add("daaddd");
         exampleList.add("st");
 
-        FileManager.writeList("a.txt", exampleList);
+        //FileManager.writeList("a.txt", exampleList);
         FileManager.deleteFiles("src\\main\\resources", "_temp");
 
         System.out.println("pom.xml exists: " + FileManager.fileExists("pom.xml"));
