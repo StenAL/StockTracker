@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: Add javadoc comments
 //TODO: migrate files to .csv format?
 //TODO: Add unit testing
 //TODO: Delete temp files when done with them (File.createTempFile()?)

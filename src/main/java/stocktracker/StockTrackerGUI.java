@@ -113,7 +113,8 @@ public class StockTrackerGUI extends Application {
 
             alert.setTitle("About StockTracker");
             alert.setHeaderText(null); // Alerts have an optional header.
-            alert.setContentText("Author: Sten Laane\nVersion: " + StockTracker.VERSION);
+            alert.setContentText("Author: Sten Arthur Laane\nVersion: " + StockTracker.VERSION);
+            new JMetro(JMetro.Style.LIGHT).applyTheme(stage.getScene());
             alert.showAndWait();});
 
         MenuItem howToUseItem = new MenuItem("Getting started");
@@ -121,9 +122,15 @@ public class StockTrackerGUI extends Application {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image("icon.png"));
+
             alert.setHeaderText(null); // Alerts have an optional header.
             alert.setTitle("How to use StockTracker");
-            alert.setContentText("***Insert tutorial here***");
+            alert.setContentText("1. Press 'New Tracker'\n2. Choose the date you wish to start" +
+                    " tracking the stocks from\n3. Write down the stock you wish to track " +
+                    "and what currency it's traded in (e.g. AAPL_USD) in the ticker_currency field. " +
+                    "Write how much of that stock you own in the amount field." +
+                    "\n4. Press 'Go!'");
+            new JMetro(JMetro.Style.LIGHT).applyTheme(stage.getScene());
             alert.showAndWait();});
         helpMenu.getItems().addAll(aboutItem, howToUseItem);
 
