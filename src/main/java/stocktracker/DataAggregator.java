@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DataAggregator {
-    // TODO: Add workingDir field
+class DataAggregator {
     // TODO: Padding money and stock decimal places with zeroes
     public static void main(String[] args) {
         test();
@@ -23,7 +22,7 @@ public class DataAggregator {
         calculateMoney(testList, testAmounts);
     }
 
-    public static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) {
+    static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) {
         aggregate(ticker_currency);
         List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.txt");
         List<String> dateMoney = new ArrayList<>();
@@ -44,14 +43,40 @@ public class DataAggregator {
         FileManager.writeList(StockTracker.PATH + "money.txt", dateMoney);
     }
 
+    private static void aggregate(List<String> ticker_currency) {
+        String workingDir = StockTracker.PATH;
+        for (String combination: ticker_currency) {
+            aggregate(combination);
+        }
+        List<String> data;
+        try {
+            String dest = workingDir + "aggregated_temp.txt";
+            data = Files.readAllLines(Paths.get(workingDir + "/" + ticker_currency.get(0) + "_temp.txt"));
+            for (int i = 0; i < data.size(); i++) {
+                String line = data.get(i);
+                data.set(i, line.substring(0,11) + "! " + line.substring(11));
+            }
+            for (int i = 1; i < ticker_currency.size(); i++) {
+                List<String> fileLines = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency.get(i) + "_temp.txt"));
+                for (int j = 0; j < fileLines.size(); j++) {
+                    String stockPrice = fileLines.get(j).split(" ")[1];
+                    String currencyRate = fileLines.get(j).split(" ")[2];
+                    data.set(j, data.get(j) + " ! " + stockPrice + " " + currencyRate);
+                }
+            }
+            FileManager.writeList(dest, data);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * There are more dates in the currency file than in the ticker one because stock markets
      * are closed on nation holidays. Therefore we use the the last day's stock market close
      * on dates with no values. If the first day of the whole file happens to be a market
      * holiday then we use the next available day's close value instead.
-     * @param ticker_currency
      */
-    public static void aggregate(String ticker_currency) {
+    private static void aggregate(String ticker_currency) {
         String workingDir = StockTracker.PATH;
         String ticker = ticker_currency.split("_")[0];
         String currency = ticker_currency.split("_")[1];
@@ -124,33 +149,4 @@ public class DataAggregator {
             ratesList.add(index, ratesList.get(index));
         }
     }
-
-    public static void aggregate(List<String> ticker_currency) {
-        String workingDir = StockTracker.PATH;
-        for (String combination: ticker_currency) {
-            aggregate(combination);
-        }
-        List<String> data;
-        try {
-            String dest = workingDir + "aggregated_temp.txt";
-            data = Files.readAllLines(Paths.get(workingDir + "/" + ticker_currency.get(0) + "_temp.txt"));
-            for (int i = 0; i < data.size(); i++) {
-                String line = data.get(i);
-                data.set(i, line.substring(0,11) + "! " + line.substring(11));
-            }
-            for (int i = 1; i < ticker_currency.size(); i++) {
-                List<String> fileLines = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency.get(i) + "_temp.txt"));
-                for (int j = 0; j < fileLines.size(); j++) {
-                    String stockPrice = fileLines.get(j).split(" ")[1];
-                    String currencyRate = fileLines.get(j).split(" ")[2];
-                    data.set(j, data.get(j) + " ! " + stockPrice + " " + currencyRate);
-                }
-            }
-            FileManager.writeList(dest, data);
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
 }

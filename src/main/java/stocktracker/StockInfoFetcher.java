@@ -7,11 +7,10 @@ import org.patriques.output.AlphaVantageException;
 import org.patriques.output.timeseries.DailyAdjusted;
 import org.patriques.output.timeseries.data.StockData;
 
-import java.io.FileWriter;
 import java.time.LocalDate;
 import java.util.*;
 
-public class StockInfoFetcher {
+class StockInfoFetcher {
 
     private static final String API_KEY = "NZ04YC2MOTE5AN4P";
     private static final int TIMEOUT = 3000;
@@ -27,27 +26,14 @@ public class StockInfoFetcher {
 
     }
 
-    public static void getData(String ticker, LocalDate startDate) {
+    static void getData(String ticker, LocalDate startDate) {
         Map<String, String> data = fetchData(ticker, startDate);
         writeData(data, ticker);
 
         System.out.println("Fetcing " + ticker + " done");
     }
 
-    public static LocalDate getMostRecentDay() {
-        AlphaVantageConnector apiConnector = new AlphaVantageConnector(API_KEY, TIMEOUT);
-        TimeSeries stockTimeSeries = new TimeSeries(apiConnector);
-        try {
-            List<StockData> temp = stockTimeSeries.daily("IVV").getStockData();
-            LocalDate lastDate = temp.get(0).getDateTime().toLocalDate();
-            return lastDate;
-        }
-        catch (AlphaVantageException e) {
-            return LocalDate.now();
-        }
-    }
-
-    public static Map<String, String> fetchData(String ticker, LocalDate startDate)
+    private static Map<String, String> fetchData(String ticker, LocalDate startDate)
     {
         AlphaVantageConnector apiConnector = new AlphaVantageConnector(API_KEY, TIMEOUT);
         TimeSeries stockTimeSeries = new TimeSeries(apiConnector);
@@ -83,7 +69,8 @@ public class StockInfoFetcher {
             return null;
         }
     }
-    public static void writeData(Map<String, String> data, String ticker) {
+
+    private static void writeData(Map<String, String> data, String ticker) {
         String filename = StockTracker.PATH + ticker + "_temp.txt";
         System.out.println(filename);
         Map<String, String> map = new TreeMap<>(data);
@@ -102,6 +89,19 @@ public class StockInfoFetcher {
         } catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    static LocalDate getMostRecentDay() {
+        AlphaVantageConnector apiConnector = new AlphaVantageConnector(API_KEY, TIMEOUT);
+        TimeSeries stockTimeSeries = new TimeSeries(apiConnector);
+        try {
+            List<StockData> temp = stockTimeSeries.daily("IVV").getStockData();
+            // last date is first in list
+            return temp.get(0).getDateTime().toLocalDate();
+        }
+        catch (AlphaVantageException e) {
+            return LocalDate.now();
         }
     }
 }

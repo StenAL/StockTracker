@@ -17,16 +17,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CurrencyRateFetcher {
+class CurrencyRateFetcher {
 
-    private XMLParser xmlParser;
-    private String currencyCode;
+    private final XMLParser xmlParser;
+    private final String currencyCode;
+
+    private CurrencyRateFetcher(String currencyCode) {
+        this.currencyCode = currencyCode;
+        this.xmlParser = new XMLParser();
+    }
 
     public static void main(String[] args)  {
         writeCurrencyInfo("USD", LocalDate.of(2018, 9, 24));
     }
 
-    public static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) {
+    static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) {
         CurrencyRateFetcher fetcher = new CurrencyRateFetcher(currencyCode);
 
         String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
@@ -39,11 +44,6 @@ public class CurrencyRateFetcher {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private CurrencyRateFetcher(String currencyCode) {
-        this.currencyCode = currencyCode;
-        this.xmlParser = new XMLParser();
     }
 
     private class XMLParser
@@ -67,11 +67,9 @@ public class CurrencyRateFetcher {
             }
         }
 
-
         /**
          * If anything ever breaks, use this:
          * https://www.mkyong.com/java/how-to-read-xml-file-in-java-dom-parser/
-         * @param src
          */
         public List<String> parse(String src) {
             try {
@@ -129,7 +127,7 @@ public class CurrencyRateFetcher {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
                 String nextLine = "";
                 while ((nextLine = reader.readLine()) != null) {
-                    sb.append(nextLine + newLine);
+                    sb.append(nextLine).append(newLine);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

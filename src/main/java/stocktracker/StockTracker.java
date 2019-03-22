@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: Add javadoc comments
-//TODO: Keep old save configurations and data in Excel table to use API less and boost speed
-//TODO: Add .exe somehow
+//TODO: migrate files to .csv format?
 public class StockTracker {
 
     public static final String VERSION = "0.X";
@@ -26,9 +25,7 @@ public class StockTracker {
         }
     }
 
-
     public static void main(String[] args) {
-
         runNewTest();
         //runExistingTest();
     }
@@ -53,18 +50,41 @@ public class StockTracker {
         //deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
-
     }
 
     private static void runExistingTest() {
         updateSave();
     }
 
+    /**
+     * Writes data of a specified stock and currency to text files.
+     * @param ticker Ticker of the stock to be recorded.
+     * @param currencyCode Currcency code of currency to be recorded.
+     * @param startDate First date the data is written from.
+     */
     public static void writeData(String ticker, String currencyCode, LocalDate startDate) {
         StockInfoFetcher.getData(ticker, startDate);
         CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
     }
 
+    /**
+     * Calculates the total value of a stock based on the amount owned.
+     * @param ticker_currency Ticker and currency of stock.
+     * @param stockAmounts Amount of stock owned.
+     */
+    public static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts)
+    {
+        DataAggregator.calculateMoney(ticker_currency, stockAmounts);
+    }
+
+    /**
+     * Creates three text files. The first one saves the stock tickers and currency codes
+     * and stock amounts specified. The others act as a cache and keep fetched data
+     * as to not call the APIs too much and improve performance.
+     * @param nameList List containing stocks' tickers and currency codes in the form
+     *                 "TICKER_CURRENCYCODE".
+     * @param amountList List containing amounts of stocks specified in nameList owned.
+     */
     public static void createSave(ArrayList<String> nameList, ArrayList<Number> amountList) {
         boolean append = false;
         for (int i = 0; i < nameList.size(); i++) {
@@ -82,6 +102,9 @@ public class StockTracker {
         }
     }
 
+    /**
+     * Reads the save files and if data in them is outdated, updates them.
+     */
     public static void updateSave() {
         List<String> saveConfig = FileManager.readLines(PATH + "save_config.txt");
         List<String> saveData = FileManager.readLines(PATH + "save_data.txt");
@@ -113,11 +136,6 @@ public class StockTracker {
         else {
             System.out.println("All up to date");
         }
-    }
-
-    public static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts)
-    {
-        DataAggregator.calculateMoney(ticker_currency, stockAmounts);
     }
 
     public static void deleteTempFiles() {
