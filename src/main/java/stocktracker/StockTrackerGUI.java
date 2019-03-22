@@ -31,7 +31,6 @@ public class StockTrackerGUI extends Application {
     }
 
     public void start(Stage primaryStage) {
-        stocksTracked = new ArrayList<>();
         this.primaryStage = primaryStage;
         setupStartScene();
         primaryStage.show();
@@ -46,6 +45,7 @@ public class StockTrackerGUI extends Application {
 
     private void setupStartScene()
     {
+        stocksTracked = new ArrayList<>();
         primaryStage.setTitle("Stock tracker");
         primaryStage.getIcons().add(new Image("icon.png"));
         statusLabel = new Label("");
@@ -252,6 +252,7 @@ public class StockTrackerGUI extends Application {
         Region region = new Region();
         root.getChildren().addAll(lineChart, hBox, region, statusLabel);
         VBox.setVgrow(region, Priority.ALWAYS);
+        setStatusLabel("Done...");
 
 
         createScene(root);
