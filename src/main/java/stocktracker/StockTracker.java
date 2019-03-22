@@ -15,15 +15,14 @@ public class StockTracker {
 
     public static final String VERSION = "0.X";
     public static final int MAX_STOCKS = 5;
-    public static String PATH;
+    public static final String PATH;
 
     static {
         try {
             PATH = URLDecoder.decode(new File(StockTracker.class.getProtectionDomain().getCodeSource().getLocation().getPath())
                         .getParent() + "/", "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            PATH = null;
+            throw new RuntimeException("Something wrong with file path");
         }
     }
 
@@ -84,8 +83,8 @@ public class StockTracker {
     }
 
     public static void updateSave() {
-        List<String> saveConfig = FileManager.readLines("src\\main\\resources\\saved_data\\save_config.txt");
-        List<String> saveData = FileManager.readLines("src\\main\\resources\\saved_data\\save_data.txt");
+        List<String> saveConfig = FileManager.readLines(PATH + "save_config.txt");
+        List<String> saveData = FileManager.readLines(PATH + "save_data.txt");
         List<String> ticker_currency = new ArrayList<>();
         List<Number> stockAmounts = new ArrayList<>();
 
@@ -103,12 +102,12 @@ public class StockTracker {
                 writeData(lineArray[0], lineArray[1], lastDate.plusDays(1));
             }
             calculateMoney(ticker_currency, stockAmounts);
-            List<String> newDataList = FileManager.readLines("src\\main\\resources\\aggregated_temp.txt");
-            List<String> newMoneyList = FileManager.readLines("src\\main\\resources\\money.txt");
+            List<String> newDataList = FileManager.readLines(PATH + "aggregated_temp.txt");
+            List<String> newMoneyList = FileManager.readLines(PATH + "money.txt");
 
             for (int i = 0; i < newDataList.size(); i++) {
-                FileManager.writeLine("src\\main\\resources\\saved_data\\save_data.txt", newDataList.get(i), true);
-                FileManager.writeLine("src\\main\\resources\\saved_data\\save_money.txt", newMoneyList.get(i), true);
+                FileManager.writeLine(PATH + "save_data.txt", newDataList.get(i), true);
+                FileManager.writeLine(PATH + "save_money.txt", newMoneyList.get(i), true);
             }
         }
         else {
