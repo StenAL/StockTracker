@@ -12,6 +12,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class StockTrackerGUI extends Application {
 
         Button existingButton = new Button("Existing tracker");
         existingButton.setPrefSize(150, 20);
-        //existingButton.setDisable(FileManager.emptyDirectory("src\\main\\resources\\saved_data"));
+        existingButton.setDisable(!new File(StockTracker.PATH + "save_config.txt").exists());
         existingButton.setOnAction(event -> {
             updateExistingData();
             makeGraphScene(false);

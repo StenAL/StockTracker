@@ -14,7 +14,7 @@ import java.util.List;
 //TODO: Delete temp files when done with them (File.createTempFile()?)
 public class StockTracker {
 
-    public static final String VERSION = "0.X";
+    public static final String VERSION = "1.1.2";
     public static final int MAX_STOCKS = 5;
     public static final String PATH;
 

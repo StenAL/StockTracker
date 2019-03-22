@@ -1,0 +1,4 @@
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+.default-color0.chart-series-line { -fx-stroke: indianred; }

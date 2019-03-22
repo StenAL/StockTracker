@@ -103,7 +103,7 @@
                         <configuration>
                             <headerType>gui</headerType>
                             <outfile>target/StockTracker.exe</outfile>
-                            <jar>target/StockTracker-${version}-jar-with-dependencies.jar</jar>
+                            <jar>target/StockTracker-${project.version}-jar-with-dependencies.jar</jar>
                             <errTitle>encc</errTitle>
                             <classPath>
                                 <mainClass>stocktracker.StockTrackerGUI</mainClass>
@@ -135,9 +135,9 @@
                 <version>1.3.0</version>
                 <configuration>
                     <description>Tracks stocks</description>
-                    <releaseName>${version}</releaseName>
+                    <releaseName>${project.version}</releaseName>
                     <tag>${project.version}</tag>
-                    <artifact>StockTracker-${version}-zip.zip</artifact>
+                    <artifact>StockTracker-${project.version}-zip.zip</artifact>
                     <fileSets>
                         <fileSet>
                             <directory>${project.build.directory}</directory>
