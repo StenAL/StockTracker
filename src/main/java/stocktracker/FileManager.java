@@ -29,7 +29,8 @@ public class FileManager {
     }
 
     public static void writeLine(String dest, String writeLine, boolean append) {
-        try (FileWriter writer = new FileWriter(dest, append)){
+        try {
+            FileWriter writer = new FileWriter(dest, append);
             writer.write(writeLine + "\n");
             writer.flush();
         } catch (Exception e) {
@@ -53,7 +54,7 @@ public class FileManager {
             append = true;
         }
     }
-    
+
     public static List<String> readLines(String dest) {
         ArrayList<String> lines = new ArrayList<>();
         try {

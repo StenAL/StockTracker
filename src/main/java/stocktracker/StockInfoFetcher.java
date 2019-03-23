@@ -7,6 +7,9 @@ import org.patriques.output.AlphaVantageException;
 import org.patriques.output.timeseries.DailyAdjusted;
 import org.patriques.output.timeseries.data.StockData;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -21,17 +24,18 @@ class StockInfoFetcher {
     }
 
     private static void test() {
-        getData("AAPL", LocalDate.now().minusDays(365));
+        //getData("AAPL", LocalDate.now().minusDays(365));
+        getData("AAPL", LocalDate.now().minusYears(7), 1);
     }
 
-    static void getData(String ticker, LocalDate startDate) {
-        Map<String, String> data = fetchData(ticker, startDate);
+    static void getData(String ticker, LocalDate startDate, double splitCoefficient) {
+        Map<String, String> data = fetchData(ticker, startDate, splitCoefficient);
         writeData(data, ticker);
 
         System.out.println("Fetcing " + ticker + " done");
     }
 
-    private static Map<String, String> fetchData(String ticker, LocalDate startDate)
+    private static Map<String, String> fetchData(String ticker, LocalDate startDate, double splitCoefficient)
     {
         AlphaVantageConnector apiConnector = new AlphaVantageConnector(API_KEY, TIMEOUT);
         TimeSeries stockTimeSeries = new TimeSeries(apiConnector);
@@ -54,12 +58,32 @@ class StockInfoFetcher {
             //Map<String, String> metaData = response.getMetaData();
             //generated = metaData.get("3. Last Refreshed");
             List<StockData> stockData = response.getStockData();
-            stockData.forEach(stock -> {
+            boolean start = true;
+            Collections.reverse(stockData);
+            for (StockData stock: stockData) {
                 LocalDate entryDate = stock.getDateTime().toLocalDate();
                 if (entryDate.isAfter(startDate.minusDays(1))) {
-                    dateCloses.put("" + entryDate, "" + stock.getClose());
+                    if (start) {
+                        splitCoefficient /= stock.getSplitCoefficient();
+                        start = false;
+                    }
+                    if (stock.getSplitCoefficient() != 1) {
+                        splitCoefficient *= stock.getSplitCoefficient();
+                    }
+                    double money = Math.round(stock.getClose()*splitCoefficient*100)/100.0;
+                    dateCloses.put("" + entryDate, "" + money);
                 }
-            });
+            }
+            List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.txt");
+            List<String> newConfig = new ArrayList<>();
+            for (String line: oldConfig) {
+                if (line.startsWith(ticker) && splitCoefficient != 1) {
+                    String[] splitLine = line.split(" ");
+                    line = splitLine[0] + " " + splitLine[1] + " " + splitCoefficient;
+                }
+                newConfig.add(line);
+            }
+            FileManager.writeList(StockTracker.PATH + "save_config.txt", newConfig);
             return dateCloses;
 
         } catch (AlphaVantageException e) {
@@ -74,11 +98,9 @@ class StockInfoFetcher {
         Set<Map.Entry<String, String>> set2 = map.entrySet();
         Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();
         try {
-            String firstDate = null;
             boolean append = false;
             while (iterator2.hasNext()) {
                 Map.Entry<String, String> me2 = iterator2.next();
-                if (firstDate == null) {firstDate = me2.getKey();}
                 String writeLine = me2.getKey()+ " " + me2.getValue();
                 FileManager.writeLine(filename, writeLine, append);
                 append = true;

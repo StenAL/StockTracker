@@ -10,11 +10,11 @@ import java.util.List;
 
 //TODO: migrate files to .csv format?
 //TODO: Add unit testing
-//TODO: Delete temp files when done with them (File.createTempFile()?)
-//TODO: Automatically get currency of stock -- use yahoo finance page
+//TODO: Automatically get currency of stock -- use Yahoo Finance page
 //TODO: Add euro support
 //TODO: Account for dividends and splits using AlphaVantage
 //TODO: Add license file? Reasearch about licenses
+//TODO: Aggregate save_data and save_money in file
 public class StockTracker {
 
     public static final String VERSION = "1.1.2";
@@ -38,20 +38,20 @@ public class StockTracker {
     private static void runNewTest()
     {
         System.out.println("$$$");
-        //writeData("IVV", "USD", LocalDate.of(2018, 9, 24));
-        writeData("IVV", "USD", LocalDate.now().minusDays(139));
-        writeData("QQQ", "USD", LocalDate.now().minusDays(139));
-
-        System.out.println("Data fetching done");
-        System.out.println("$$$");
         ArrayList<String> testList = new ArrayList<>();
         testList.add("IVV_USD");
         testList.add("QQQ_USD");
         ArrayList<Number> testAmounts = new ArrayList<>();
         testAmounts.add(5);
         testAmounts.add(10);
-        calculateMoney(testList, testAmounts);
-        createSave(testList, testAmounts);
+        createConfig(testList, testAmounts);
+        //writeData("IVV", "USD", LocalDate.of(2018, 9, 24));
+        writeData("IVV", "USD", LocalDate.now().minusDays(139), 1);
+        writeData("QQQ", "USD", LocalDate.now().minusDays(139), 1);
+
+        System.out.println("Data fetching done");
+        System.out.println("$$$");
+        createSave();
         deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
@@ -67,8 +67,8 @@ public class StockTracker {
      * @param currencyCode Currcency code of currency to be recorded.
      * @param startDate First date the data is written from.
      */
-    public static void writeData(String ticker, String currencyCode, LocalDate startDate) {
-        StockInfoFetcher.getData(ticker, startDate);
+    public static void writeData(String ticker, String currencyCode, LocalDate startDate, double splitCoefficient) {
+        StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
         CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
     }
 
@@ -83,23 +83,28 @@ public class StockTracker {
     }
 
     /**
-     * Creates three text files. The first one saves the stock tickers and currency codes
-     * and stock amounts specified. The others act as a cache and keep fetched data
-     * as to not call the APIs too much and improve performance.
      * @param nameList List containing stocks' tickers and currency codes in the form
      *                 "TICKER_CURRENCYCODE".
      * @param amountList List containing amounts of stocks specified in nameList owned.
      */
-    public static void createSave(ArrayList<String> nameList, ArrayList<Number> amountList) {
+    private static void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
         boolean append = false;
         for (int i = 0; i < nameList.size(); i++) {
             String line = nameList.get(i) + " " + amountList.get(i);
             FileManager.writeLine(PATH + "save_config.txt", line, append);
             append = true;
         }
+    }
+
+    /**
+     * Creates three text files. The first one saves the stock tickers and currency codes
+     * and stock amounts specified. The others act as a cache and keep fetched data
+     * as to not call the APIs too much and improve performance.
+     */
+    public static void createSave() {
         List<String> dataList = FileManager.readLines(PATH + "aggregated_temp.txt");
         List<String> moneyList = FileManager.readLines(PATH + "money.txt");
-        append = false;
+        boolean append = false;
         for (int i = 0; i < dataList.size(); i++) {
             FileManager.writeLine(PATH + "save_data.txt", dataList.get(i), append);
             FileManager.writeLine(PATH + "save_money.txt", moneyList.get(i), append);
@@ -127,7 +132,7 @@ public class StockTracker {
                     e.printStackTrace();
                 }
                 String[] lineArray = line.split(" ")[0].split("_");
-                writeData(lineArray[0], lineArray[1], lastDate.plusDays(1));
+                writeData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(" ")[2]));
             }
             calculateMoney(ticker_currency, stockAmounts);
             List<String> newDataList = FileManager.readLines(PATH + "aggregated_temp.txt");
