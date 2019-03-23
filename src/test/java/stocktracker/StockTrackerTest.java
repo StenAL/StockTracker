@@ -1,29 +1,30 @@
 package stocktracker;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.patriques.output.AlphaVantageException;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 //TODO: These tests are bad. Fix it
-@Ignore
 class StockTrackerTest {
 
     private static ArrayList<String> testList;
     private static ArrayList<Number> testAmounts;
-    private static String PATH = StockTracker.PATH;
+    private static final String PATH = StockTracker.PATH;
 
     @BeforeAll
-    static void setup() {
+    static void setup() throws IOException {
+        new FileWriter(new File(PATH + "USD_temp.txt")).write("broken");
+        new FileWriter(new File(PATH + "IVV_temp.txt")).write("broken");
+        new FileWriter(new File(PATH + "QQQ_temp.txt")).write("broken");
+
         testList = new ArrayList<>();
         testList.add("IVV_USD");
         testList.add("QQQ_USD");
@@ -46,13 +47,14 @@ class StockTrackerTest {
         StockTracker.deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
-        assertFalse(StockTracker.updateSave());
+        assertTrue(new File(PATH + "money.txt").exists());
+        assertTrue(new File(PATH + "save_config.txt").exists());
     }
 
     //TODO: test actually updating the save
 
     @AfterAll
     static void teardown() {
-        FileManager.deleteAllFiles(PATH);
+        FileManager.deleteTempFiles(PATH);
     }
 }

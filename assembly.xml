@@ -19,6 +19,7 @@
             <!--To include single file into the zip -->
             <includes>
                 <include>${project.artifactId}*.exe</include>
+                <include>README.md</include>
             </includes>
         </fileSet>
     </fileSets>

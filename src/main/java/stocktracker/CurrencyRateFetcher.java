@@ -28,7 +28,7 @@ class CurrencyRateFetcher {
     }
 
     public static void main(String[] args) throws IOException  {
-        writeCurrencyInfo("USDD", LocalDate.of(2018, 9, 24));
+        writeCurrencyInfo("USD", LocalDate.of(2018, 9, 24));
     }
 
     static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) throws IOException {
@@ -37,7 +37,7 @@ class CurrencyRateFetcher {
         String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
                 ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
         fetcher.xmlParser.downloadXMLFile(new URL(url_str));
-        List<String> dataList = fetcher.xmlParser.parse(StockTracker.PATH);
+        List<String> dataList = fetcher.xmlParser.parse();
         FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.txt", dataList);
         System.out.println("Fetching " + currencyCode + " done");
     }
@@ -66,10 +66,10 @@ class CurrencyRateFetcher {
          * If anything ever breaks, use this:
          * https://www.mkyong.com/java/how-to-read-xml-file-in-java-dom-parser/
          */
-        public List<String> parse(String src) {
+        private List<String> parse() {
             try {
                 ArrayList<String> dataList = new ArrayList<>();
-                src += currencyCode + "_XML_temp.xml";
+                String src = StockTracker.PATH + currencyCode + "_XML_temp.xml";
                 File fXmlFile = new File(src);
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -120,7 +120,7 @@ class CurrencyRateFetcher {
             String newLine  = System.getProperty("line.separator");
             StringBuilder sb = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-                String nextLine = "";
+                String nextLine;
                 while ((nextLine = reader.readLine()) != null) {
                     sb.append(nextLine).append(newLine);
                 }

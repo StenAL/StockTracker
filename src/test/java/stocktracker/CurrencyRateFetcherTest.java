@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CurrencyRateFetcherTest {
 
-    private static String PATH = StockTracker.PATH;
+    private static final String PATH = StockTracker.PATH;
     private static List<String> dataList;
 
     @BeforeAll
@@ -54,7 +54,7 @@ class CurrencyRateFetcherTest {
     }
 
     @AfterAll
-    static void teardown() {
-        FileManager.deleteAllFiles(PATH);
+    static void teardown() throws InterruptedException {
+        Thread.sleep(20000);
     }
 }

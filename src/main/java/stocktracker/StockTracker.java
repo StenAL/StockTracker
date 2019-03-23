@@ -139,7 +139,7 @@ public class StockTracker {
 
     /**
      * Reads the save files and if data in them is outdated, updates them.
-     * @return
+     * @return whether the file is updated or not
      */
     public static boolean updateSave() {
         List<String> saveConfig = FileManager.readLines(PATH + "save_config.txt");

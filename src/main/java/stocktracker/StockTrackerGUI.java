@@ -264,20 +264,6 @@ public class StockTrackerGUI extends Application {
         statusLabel.setText(newProgress);
     }
 
-    private void runTest()
-    {
-        writeData("IVV", "USD", LocalDate.now().minusDays(139));
-        writeData("QQQ", "USD", LocalDate.now().minusDays(139));
-        ArrayList<String> testList = new ArrayList<>();
-        testList.add("IVV_USD");
-        testList.add("QQQ_USD");
-        ArrayList<Number> testAmounts = new ArrayList<>();
-        testAmounts.add(5);
-        testAmounts.add(10);
-        calculateMoney(testList, testAmounts);
-        setStatusLabel("Ready...");
-    }
-
     private void updateExistingData() {
         StockTracker.updateSave();
     }

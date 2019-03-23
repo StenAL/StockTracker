@@ -1,8 +1,6 @@
 package stocktracker;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,7 @@ public class FileManager {
 
     public static void writeLine(String dest, String writeLine, boolean append) {
         try {
-            FileWriter writer = new FileWriter(dest, append);
+            Writer writer = new BufferedWriter(new FileWriter(dest, append));
             writer.write(writeLine + "\n");
             writer.flush();
         } catch (Exception e) {
@@ -38,6 +36,7 @@ public class FileManager {
 
     public static void writeList(String dest, List<String> writeList) {
         boolean append = false;
+
         for (String writeLine: writeList) {
             writeLine(dest, writeLine, append);
             append = true;
@@ -92,7 +91,7 @@ public class FileManager {
         File dir = new File(dest);
         File[] directoryListing = dir.listFiles();
         for (File child : directoryListing) {
-            if (!child.getPath().endsWith(".txt")) {
+            if (child.getPath().contains("_temp") || child.getPath().contains("money")) {
                 try {
                     //Files.deleteIfExists(Paths.get(child.getPath()));
                     child.delete();

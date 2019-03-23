@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DataAggregatorTest {
 
-    private static String PATH = StockTracker.PATH;
+    private static final String PATH = StockTracker.PATH;
     private static List<String> dataList;
 
     @BeforeAll
@@ -81,7 +81,6 @@ class DataAggregatorTest {
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        FileManager.deleteAllFiles(PATH);
-        Thread.sleep(10000);
+        Thread.sleep(20000);
     }
 }

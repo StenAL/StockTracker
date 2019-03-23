@@ -85,7 +85,6 @@ class DataAggregator {
         List<String> missingDates = new ArrayList<>();
         List<String> currencyRates = new ArrayList<>();
         List<String> stockRates = new ArrayList<>();
-        System.out.println(workingDir + ticker + "_temp.txt");
         for (String line: FileManager.readLines(workingDir + ticker + "_temp.txt")) {
             stockDates.add(line.split(" ")[0]);
             stockRates.add(line.split(" ")[1]);

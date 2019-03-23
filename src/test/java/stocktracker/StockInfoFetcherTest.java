@@ -1,11 +1,7 @@
 package stocktracker;
 
 import org.junit.jupiter.api.*;
-import org.patriques.AlphaVantageConnector;
-import org.patriques.TimeSeries;
 import org.patriques.output.AlphaVantageException;
-
-import java.time.format.DateTimeParseException;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -44,7 +40,6 @@ class StockInfoFetcherTest {
 
         @Test
         void testDataSize() {
-            System.out.println(dataList.size());
             assertTrue(dataList.size() > 200);
         }
 
@@ -75,7 +70,6 @@ class StockInfoFetcherTest {
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        FileManager.deleteAllFiles(PATH);
-        Thread.sleep(15000);
+        Thread.sleep(20000);
     }
 }
