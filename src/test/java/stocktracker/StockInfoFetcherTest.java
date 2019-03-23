@@ -14,23 +14,23 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StockInfoFetcherTest {
-
+    private static String PATH;
+    private static List<String> dataList;
     @BeforeAll
-    static void updateData() {
-        StockInfoFetcher.getData("AAPL", LocalDate.now().minusDays(365));
+    static synchronized void updateData() {
+        StockInfoFetcher.getData("TSLA", LocalDate.now().minusDays(365));
+        PATH = StockTracker.PATH;
+        dataList = FileManager.readLines(PATH + "TSLA_temp.txt");
     }
 
     @Nested
     @DisplayName("getData")
     class getDataTests {
 
-        String PATH = StockTracker.PATH;
-        List<String> dataList = FileManager.readLines(PATH + "AAPL_temp.txt");
-
         @Test
         void testInvalidTicker() {
             assertThrows(AlphaVantageException.class, () -> StockInfoFetcher
-                    .getData("AAAPL", LocalDate.now().minusDays(365)));
+                    .getData("STEN", LocalDate.now().minusDays(365)));
         }
 
         @Test
@@ -44,12 +44,13 @@ class StockInfoFetcherTest {
 
         @Test
         void testDataSize() {
+            System.out.println(dataList.size());
             assertTrue(dataList.size() > 200);
         }
 
         @Test
         void testFetchingNewData() {
-            File dataFile = new File(PATH + "AAPL_temp.txt");
+            File dataFile = new File(PATH + "TSLA_temp.txt");
             assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
         }
 
@@ -61,7 +62,6 @@ class StockInfoFetcherTest {
                 assertDoesNotThrow(() -> Integer.parseInt(config[1]));
                 assertDoesNotThrow(() -> Double.parseDouble(config[2]));
             }
-
         }
     }
 
@@ -71,5 +71,11 @@ class StockInfoFetcherTest {
         LocalDate mostRecent = StockInfoFetcher.getMostRecentDay();
         assertTrue(mostRecent.isBefore(now) || mostRecent.isEqual(now));
         assertTrue(mostRecent.isAfter(now.minusDays(7)));
+    }
+
+    @AfterAll
+    static void teardown() throws InterruptedException {
+        FileManager.deleteAllFiles(PATH);
+        Thread.sleep(15000);
     }
 }

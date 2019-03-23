@@ -1,5 +1,6 @@
 package stocktracker;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -50,5 +51,10 @@ class CurrencyRateFetcherTest {
     void testFetchingNewData() {
         File dataFile = new File(PATH + "USD_temp.txt");
         assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
+    }
+
+    @AfterAll
+    static void teardown() {
+        FileManager.deleteAllFiles(PATH);
     }
 }

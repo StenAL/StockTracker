@@ -1,5 +1,7 @@
 package stocktracker;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.patriques.output.AlphaVantageException;
@@ -12,7 +14,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//TODO: This test is bad. Fix it
+//TODO: These tests are bad. Fix it
+@Ignore
 class StockTrackerTest {
 
     private static ArrayList<String> testList;
@@ -33,7 +36,7 @@ class StockTrackerTest {
     void runNewTest()
     {
         StockTracker.createConfig(testList, testAmounts);
-        StockTracker.writeData("ASDIVV", "USD", LocalDate.now().minusDays(139));
+        StockTracker.writeData("IVV", "USD", LocalDate.now().minusDays(139));
         StockTracker.writeData("QQQ", "USD", LocalDate.now().minusDays(139));
 
         System.out.println("Data fetching done");
@@ -43,12 +46,13 @@ class StockTrackerTest {
         StockTracker.deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
-    }
-
-    //TODO: test actually updating the save
-    @Test
-    void updateSave() {
         assertFalse(StockTracker.updateSave());
     }
 
+    //TODO: test actually updating the save
+
+    @AfterAll
+    static void teardown() {
+        FileManager.deleteAllFiles(PATH);
+    }
 }

@@ -59,7 +59,7 @@ public class FileManager {
             Files.lines(Paths.get(dest))
                     .forEach(lines::add);
         } catch (NoSuchFileException e) {
-            throw new InvalidPathException("", "No such file exists");
+            throw new InvalidPathException("", "No file exists at " + dest);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,6 +77,22 @@ public class FileManager {
         File[] directoryListing = dir.listFiles();
         for (File child : directoryListing) {
             if (!child.getPath().startsWith("save_") && child.getPath().contains("_temp")) {
+                try {
+                    //Files.deleteIfExists(Paths.get(child.getPath()));
+                    child.delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void deleteAllFiles(String dest)
+    {
+        File dir = new File(dest);
+        File[] directoryListing = dir.listFiles();
+        for (File child : directoryListing) {
+            if (!child.getPath().endsWith(".txt")) {
                 try {
                     //Files.deleteIfExists(Paths.get(child.getPath()));
                     child.delete();

@@ -1,5 +1,6 @@
 package stocktracker;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +35,7 @@ class DataAggregatorTest {
         testAmounts.add(5);
         testAmounts.add(10);
         try {
+            System.out.println(testList + " " + testAmounts);
             DataAggregator.calculateMoney(testList, testAmounts);
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,5 +77,11 @@ class DataAggregatorTest {
         List<String> data = FileManager.readLines(PATH + "AAPL_USD_temp.txt");
         assertTrue(data.size() > 200);
         assertTrue(new File(PATH + "AAPL_USD_temp.txt").lastModified() > System.currentTimeMillis()-120000);
+    }
+
+    @AfterAll
+    static void teardown() throws InterruptedException {
+        FileManager.deleteAllFiles(PATH);
+        Thread.sleep(10000);
     }
 }

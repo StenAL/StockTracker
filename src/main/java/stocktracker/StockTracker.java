@@ -56,7 +56,7 @@ public class StockTracker {
         System.out.println("$$$");
         calculateMoney(testList, testAmounts);
         createSave();
-        deleteTempFiles();
+        //deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
     }
@@ -115,7 +115,7 @@ public class StockTracker {
     public static void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
         boolean append = false;
         for (int i = 0; i < nameList.size(); i++) {
-            String line = nameList.get(i) + " " + amountList.get(i);
+            String line = nameList.get(i) + " " + amountList.get(i) + " 1.0";
             FileManager.writeLine(PATH + "save_config.txt", line, append);
             append = true;
         }
