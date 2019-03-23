@@ -284,7 +284,7 @@ public class StockTrackerGUI extends Application {
 
     private void writeData(String ticker, String currencyCode, LocalDate startDate) {
         setStatusLabel("Fetching " + ticker + " data...");
-        StockTracker.writeData(ticker, currencyCode, startDate, 1);
+        StockTracker.writeData(ticker, currencyCode, startDate);
     }
 
     private static void createSave() {

@@ -1,6 +1,9 @@
 package stocktracker;
 
+import org.patriques.output.AlphaVantageException;
+
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.NumberFormat;
@@ -9,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: migrate files to .csv format?
-//TODO: Add unit testing
+//TODO: Add more/better jUnit testing
 //TODO: Automatically get currency of stock -- use Yahoo Finance page
 //TODO: Add euro support
-//TODO: Account for dividends and splits using AlphaVantage
-//TODO: Add license file? Reasearch about licenses
-//TODO: Aggregate save_data and save_money in file
+//TODO: Account for dividends using AlphaVantage + add boolean for reinvesting dividends
+//TODO: Add license file? Research about licenses
+//TODO: Aggregate save_data and save_money in a single file
 public class StockTracker {
 
     public static final String VERSION = "1.1.2";
@@ -46,11 +49,12 @@ public class StockTracker {
         testAmounts.add(10);
         createConfig(testList, testAmounts);
         //writeData("IVV", "USD", LocalDate.of(2018, 9, 24));
-        writeData("IVV", "USD", LocalDate.now().minusDays(139), 1);
-        writeData("QQQ", "USD", LocalDate.now().minusDays(139), 1);
+        writeData("IVV", "USD", LocalDate.now().minusDays(139));
+        writeData("QQQ", "USD", LocalDate.now().minusDays(139));
 
         System.out.println("Data fetching done");
         System.out.println("$$$");
+        calculateMoney(testList, testAmounts);
         createSave();
         deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
@@ -67,9 +71,26 @@ public class StockTracker {
      * @param currencyCode Currcency code of currency to be recorded.
      * @param startDate First date the data is written from.
      */
-    public static void writeData(String ticker, String currencyCode, LocalDate startDate, double splitCoefficient) {
-        StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
-        CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
+    public static void writeData(String ticker, String currencyCode, LocalDate startDate) {
+        try {
+            StockInfoFetcher.getData(ticker, startDate);
+            CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
+        } catch (AlphaVantageException e) {
+            System.out.println("Invalid stock ticker '" + ticker + "'");
+        } catch (IOException e) {
+            System.out.println("Invalid currency code'" + currencyCode + "'");
+        }
+    }
+
+    public static void updateData(String ticker, String currencyCode, LocalDate startDate, double splitCoefficient) {
+        try {
+            StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
+            CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
+        } catch (AlphaVantageException e) {
+            System.out.println("Invalid stock ticker '" + ticker + "'");
+        } catch (IOException e) {
+            System.out.println("Invalid currency code'" + currencyCode + "'");
+        }
     }
 
     /**
@@ -79,7 +100,11 @@ public class StockTracker {
      */
     public static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts)
     {
-        DataAggregator.calculateMoney(ticker_currency, stockAmounts);
+        try {
+            DataAggregator.calculateMoney(ticker_currency, stockAmounts);
+        } catch (IOException e) {
+            System.out.println("Something went horrendously wrong");
+        }
     }
 
     /**
@@ -87,7 +112,7 @@ public class StockTracker {
      *                 "TICKER_CURRENCYCODE".
      * @param amountList List containing amounts of stocks specified in nameList owned.
      */
-    private static void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
+    public static void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
         boolean append = false;
         for (int i = 0; i < nameList.size(); i++) {
             String line = nameList.get(i) + " " + amountList.get(i);
@@ -114,8 +139,9 @@ public class StockTracker {
 
     /**
      * Reads the save files and if data in them is outdated, updates them.
+     * @return
      */
-    public static void updateSave() {
+    public static boolean updateSave() {
         List<String> saveConfig = FileManager.readLines(PATH + "save_config.txt");
         List<String> saveData = FileManager.readLines(PATH + "save_data.txt");
         List<String> ticker_currency = new ArrayList<>();
@@ -132,7 +158,7 @@ public class StockTracker {
                     e.printStackTrace();
                 }
                 String[] lineArray = line.split(" ")[0].split("_");
-                writeData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(" ")[2]));
+                updateData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(" ")[2]));
             }
             calculateMoney(ticker_currency, stockAmounts);
             List<String> newDataList = FileManager.readLines(PATH + "aggregated_temp.txt");
@@ -145,7 +171,9 @@ public class StockTracker {
         }
         else {
             System.out.println("All up to date");
+            return false;
         }
+        return true;
     }
 
     /**

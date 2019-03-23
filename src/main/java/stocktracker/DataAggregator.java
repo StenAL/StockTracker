@@ -1,28 +1,27 @@
 package stocktracker;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 class DataAggregator {
     // TODO: Padding money and stock decimal places with zeroes
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         test();
     }
 
-    private static void test() {
+    private static void test() throws IOException {
         ArrayList<String> testList = new ArrayList<>();
+        testList.add("QQ_USD");
         testList.add("IVV_USD");
-        testList.add("QQQ_USD");
         ArrayList<Number> testAmounts = new ArrayList<>();
         testAmounts.add(5);
         testAmounts.add(10);
         calculateMoney(testList, testAmounts);
     }
 
-    static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) {
+    static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) throws IOException {
         aggregate(ticker_currency);
         List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.txt");
         List<String> dateMoney = new ArrayList<>();
@@ -43,7 +42,7 @@ class DataAggregator {
         FileManager.writeList(StockTracker.PATH + "money.txt", dateMoney);
     }
 
-    private static void aggregate(List<String> ticker_currency) {
+    private static void aggregate(List<String> ticker_currency) throws IOException {
         String workingDir = StockTracker.PATH;
         for (String combination: ticker_currency) {
             aggregate(combination);
@@ -76,7 +75,7 @@ class DataAggregator {
      * on dates with no values. If the first day of the whole file happens to be a market
      * holiday then we use the next available day's close value instead.
      */
-    private static void aggregate(String ticker_currency) {
+    private static void aggregate(String ticker_currency) throws IOException {
         String workingDir = StockTracker.PATH;
         String ticker = ticker_currency.split("_")[0];
         String currency = ticker_currency.split("_")[1];
@@ -86,57 +85,53 @@ class DataAggregator {
         List<String> missingDates = new ArrayList<>();
         List<String> currencyRates = new ArrayList<>();
         List<String> stockRates = new ArrayList<>();
-        try {
-            for (String line: FileManager.readLines(workingDir + ticker + "_temp.txt")) {
-                stockDates.add(line.split(" ")[0]);
-                stockRates.add(line.split(" ")[1]);
-            }
-
-            for (String line: FileManager.readLines(workingDir + currency + "_temp.txt")) {
-                currencyDates.add(line.split(" ")[0]);
-                currencyRates.add(line.split(" ")[1]);
-            }
-
-            for (String stockDate: stockDates) {
-                aggregateDates.add(stockDate);
-                if (!currencyDates.contains(stockDate)) {missingDates.add(stockDate + " C");} // C for currency
-            }
-            for (String currencyDate: currencyDates) {
-                if (!aggregateDates.contains(currencyDate)) {
-                    missingDates.add(currencyDate + " S"); // S for stock
-                    aggregateDates.add(currencyDate);
-                }
-            }
-            Collections.sort(aggregateDates);
-            for (String date: missingDates) {
-                String missing = date.split(" ")[1];
-                date = date.split(" ")[0];
-                if (missing.equals("C")) {
-                    fillMissingDates(currencyDates, currencyRates, date);
-                }
-                else {
-                    fillMissingDates(stockDates, stockRates, date);
-                }
-                //TODO: Add actual logging for this
-                System.out.println(ticker + ": missing " + missing + " on " + date);
-            }
-
-            if (aggregateDates.size() != currencyRates.size() || aggregateDates.size() != stockRates.size()) {
-                System.out.println("Something went horrendously wrong :(");
-                throw new Exception();
-            }
-
-
-            String dest = StockTracker.PATH + ticker + "_" + currency + "_temp.txt";
-            List<String> writeList = new ArrayList<>();
-            for (int i = 0; i < aggregateDates.size(); i++) {
-                writeList.add(aggregateDates.get(i) + " " + stockRates.get(i) + " " + currencyRates.get(i));
-            }
-            FileManager.writeList(dest, writeList);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (String line: FileManager.readLines(workingDir + ticker + "_temp.txt")) {
+            stockDates.add(line.split(" ")[0]);
+            stockRates.add(line.split(" ")[1]);
         }
+
+        for (String line: FileManager.readLines(workingDir + currency + "_temp.txt")) {
+            currencyDates.add(line.split(" ")[0]);
+            currencyRates.add(line.split(" ")[1]);
+        }
+
+        for (String stockDate: stockDates) {
+            aggregateDates.add(stockDate);
+            if (!currencyDates.contains(stockDate)) {missingDates.add(stockDate + " C");} // C for currency
+        }
+        for (String currencyDate: currencyDates) {
+            if (!aggregateDates.contains(currencyDate)) {
+                missingDates.add(currencyDate + " S"); // S for stock
+                aggregateDates.add(currencyDate);
+            }
+        }
+        Collections.sort(aggregateDates);
+        for (String date: missingDates) {
+            String missing = date.split(" ")[1];
+            date = date.split(" ")[0];
+            if (missing.equals("C")) {
+                fillMissingDates(currencyDates, currencyRates, date);
+            }
+            else {
+                fillMissingDates(stockDates, stockRates, date);
+            }
+            //TODO: Add actual logging for this
+            System.out.println(ticker + ": missing " + missing + " on " + date);
+        }
+
+        if (aggregateDates.size() != currencyRates.size() || aggregateDates.size() != stockRates.size()) {
+            System.out.println("Something went horrendously wrong :(");
+            throw new IOException();
+        }
+
+
+        String dest = StockTracker.PATH + ticker + "_" + currency + "_temp.txt";
+        List<String> writeList = new ArrayList<>();
+        for (int i = 0; i < aggregateDates.size(); i++) {
+            writeList.add(aggregateDates.get(i) + " " + stockRates.get(i) + " " + currencyRates.get(i));
+        }
+        FileManager.writeList(dest, writeList);
+
     }
 
     private static void fillMissingDates(List<String> datesList, List<String> ratesList, String date) {

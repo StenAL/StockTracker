@@ -27,44 +27,39 @@ class CurrencyRateFetcher {
         this.xmlParser = new XMLParser();
     }
 
-    public static void main(String[] args)  {
-        writeCurrencyInfo("USD", LocalDate.of(2018, 9, 24));
+    public static void main(String[] args) throws IOException  {
+        writeCurrencyInfo("USDD", LocalDate.of(2018, 9, 24));
     }
 
-    static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) {
+    static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) throws IOException {
         CurrencyRateFetcher fetcher = new CurrencyRateFetcher(currencyCode);
 
         String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
                 ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
-        try {
-            fetcher.xmlParser.downloadXMLFile(new URL(url_str));
-            List<String> dataList = fetcher.xmlParser.parse(StockTracker.PATH);
-            FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.txt", dataList);
-            System.out.println("Fetching " + currencyCode + " done");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        fetcher.xmlParser.downloadXMLFile(new URL(url_str));
+        List<String> dataList = fetcher.xmlParser.parse(StockTracker.PATH);
+        FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.txt", dataList);
+        System.out.println("Fetching " + currencyCode + " done");
     }
 
     private class XMLParser
     {
-        private void downloadXMLFile(URL url)  {
-            try {
+        private void downloadXMLFile(URL url) throws IOException {
                 final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setDoInput(true);
                 connection.setDoOutput(true);
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("Accept", "text/xml");
 
-                //TODO: Unit testing - assert response code 200
                 System.out.println("Response code: " + connection.getResponseCode());
                 String readStream = readStream(connection.getInputStream());
-                List<String> lines = Arrays.asList(readStream.split("\n"));
-                Path file = Paths.get(StockTracker.PATH + currencyCode + "_XML_temp.xml");
-                Files.write(file, lines, Charset.forName("UTF-8"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                try {
+                    List<String> lines = Arrays.asList(readStream.split("\n"));
+                    Path file = Paths.get(StockTracker.PATH + currencyCode + "_XML_temp.xml");
+                    Files.write(file, lines, Charset.forName("UTF-8"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
 
         /**

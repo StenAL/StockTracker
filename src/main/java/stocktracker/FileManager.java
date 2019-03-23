@@ -3,9 +3,7 @@ package stocktracker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +58,9 @@ public class FileManager {
         try {
             Files.lines(Paths.get(dest))
                     .forEach(lines::add);
-        } catch (Exception e) {
+        } catch (NoSuchFileException e) {
+            throw new InvalidPathException("", "No such file exists");
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return lines;
