@@ -51,13 +51,13 @@ class DataAggregator {
         List<String> data;
         try {
             String dest = workingDir + "aggregated_temp.txt";
-            data = Files.readAllLines(Paths.get(workingDir + "/" + ticker_currency.get(0) + "_temp.txt"));
+            data = FileManager.readLines(workingDir + "/" + ticker_currency.get(0) + "_temp.txt");
             for (int i = 0; i < data.size(); i++) {
                 String line = data.get(i);
                 data.set(i, line.substring(0,11) + "! " + line.substring(11));
             }
             for (int i = 1; i < ticker_currency.size(); i++) {
-                List<String> fileLines = Files.readAllLines(Paths.get(workingDir + "\\" + ticker_currency.get(i) + "_temp.txt"));
+                List<String> fileLines = FileManager.readLines(workingDir + "\\" + ticker_currency.get(i) + "_temp.txt");
                 for (int j = 0; j < fileLines.size(); j++) {
                     String stockPrice = fileLines.get(j).split(" ")[1];
                     String currencyRate = fileLines.get(j).split(" ")[2];

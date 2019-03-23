@@ -2,7 +2,9 @@ package stocktracker;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +23,18 @@ public class FileManager {
         exampleList.add("daaddd");
         exampleList.add("st");
 
-        //FileManager.writeList("a.txt", exampleList);
-        FileManager.deleteFiles("src\\main\\resources", "_temp");
-
         System.out.println("pom.xml exists: " + FileManager.fileExists("pom.xml"));
         System.out.println("b.txt exists: " + FileManager.fileExists("b.txt"));
         System.out.println(readLines(".gitignore"));
+    }
+
+    public static void writeLine(String dest, String writeLine, boolean append) {
+        try (FileWriter writer = new FileWriter(dest, append)){
+            writer.write(writeLine + "\n");
+            writer.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void writeList(String dest, List<String> writeList) {
@@ -34,25 +42,6 @@ public class FileManager {
         for (String writeLine: writeList) {
             writeLine(dest, writeLine, append);
             append = true;
-        }
-    }
-
-    public static void deleteFiles(String dest, String suffix)
-    {
-        File dir = new File(dest);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                String fname = child.getName();
-                int pos = fname.lastIndexOf(".");
-                if (pos > 0) {
-                    fname = fname.substring(0, pos);
-                }
-                if (fname.endsWith(suffix)) {
-                    child.delete();
-                }
-
-            }
         }
     }
 
@@ -64,7 +53,7 @@ public class FileManager {
             append = true;
         }
     }
-
+    
     public static List<String> readLines(String dest) {
         ArrayList<String> lines = new ArrayList<>();
         try {
@@ -76,18 +65,24 @@ public class FileManager {
         return lines;
     }
 
-    public static void writeLine(String dest, String writeLine, boolean append) {
-        try {
-            FileWriter writer = new FileWriter(dest, append);
-            writer.write(writeLine + "\n");
-            writer.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static boolean fileExists(String dest) {
         File file = new File(dest);
         return file.isFile();
+    }
+
+    public static void deleteTempFiles(String dest)
+    {
+        File dir = new File(dest);
+        File[] directoryListing = dir.listFiles();
+        for (File child : directoryListing) {
+            if (!child.getPath().startsWith("save_") && child.getPath().contains("_temp")) {
+                try {
+                    //Files.deleteIfExists(Paths.get(child.getPath()));
+                    child.delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

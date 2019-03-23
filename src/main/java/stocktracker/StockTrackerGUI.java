@@ -196,8 +196,6 @@ public class StockTrackerGUI extends Application {
                 dataList.add(data);
             }
         }
-        System.out.println(dataList);
-        System.out.println(amounts);
         calculateMoney(dataList, amounts);
         createSave(dataList, amounts);
         makeGraphScene(true);
@@ -254,8 +252,12 @@ public class StockTrackerGUI extends Application {
         VBox.setVgrow(region, Priority.ALWAYS);
         setStatusLabel("Done...");
 
-
         createScene(root);
+    }
+
+    @Override
+    public void stop(){
+        deleteTempFiles();
     }
 
     private void setStatusLabel(String newProgress) {
@@ -292,6 +294,10 @@ public class StockTrackerGUI extends Application {
     private void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts) {
         setStatusLabel("Aggregating data..." );
         StockTracker.calculateMoney(ticker_currency, stockAmounts);
+    }
+
+    private void deleteTempFiles() {
+        StockTracker.deleteTempFiles();
     }
 
 
