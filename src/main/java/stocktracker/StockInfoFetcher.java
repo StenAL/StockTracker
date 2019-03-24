@@ -72,8 +72,17 @@ class StockInfoFetcher {
                 if (stock.getSplitCoefficient() != 1) {
                     splitCoefficient *= stock.getSplitCoefficient();
                 }
-                double money = Math.round(stock.getClose()*splitCoefficient*100)/100.0;
-                dateCloses.put("" + entryDate, "" + money);
+
+                // Padding with trailing zeroes:
+                String actualPrice = "" + Math.round(stock.getClose()*splitCoefficient*100)/100.0;
+                // ?? period acting wrong and refusing to split, but works after splitting
+                actualPrice = actualPrice.replace(".", ":");
+                while (actualPrice.split(":")[1].length() < 2) {
+                    actualPrice = actualPrice.concat("0");
+                }
+                actualPrice = actualPrice.replace(":", ".");
+
+                dateCloses.put("" + entryDate, "" + actualPrice);
             }
         }
         List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.csv");

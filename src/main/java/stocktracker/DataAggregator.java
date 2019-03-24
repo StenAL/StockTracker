@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 class DataAggregator {
-    // TODO: Padding money and stock decimal places with zeroes
     public static void main(String[] args) throws IOException {
         test();
     }
@@ -34,9 +33,18 @@ class DataAggregator {
 
                 //System.out.println(stockPrice + " " + currencyRate);
                 money += stockPrice/currencyRate * stockAmounts.get((i-1)/2).doubleValue();
+                String paddedMoney = "" + money;
             }
             money = Math.round(money * 100D) / 100D;
-            dateMoney.add(line + "," + money);
+            // Padding with trailing zeroes:
+            // ?? period acting wrong and refusing to split, but works after splitting
+            String paddedMoney = "" + money;
+            paddedMoney = paddedMoney.replace(".", "x");
+            while (paddedMoney.split("x")[1].length() < 2) {
+                paddedMoney = paddedMoney.concat("0");
+            }
+            paddedMoney = paddedMoney.replace("x", ".");
+            dateMoney.add(line + "," + paddedMoney);
         }
         FileManager.writeList(StockTracker.PATH + "aggregated_with_money_temp.csv", dateMoney);
     }

@@ -13,7 +13,6 @@ import java.util.List;
 
 //TODO: Add more/better jUnit testing
 //TODO: Automatically get currency of stock -- use Yahoo Finance page
-//TODO: Add euro support
 //TODO: Account for dividends using AlphaVantage + add boolean for reinvesting dividends
 //TODO: Add license file? Research about licenses
 //TODO: Add proper README
