@@ -27,7 +27,6 @@ class DataAggregator {
         List<String> dateMoney = new ArrayList<>();
         for (String line: finalData) {
             String[] components = line.split(",");
-            String date = components[0];
             double money = 0;
             for (int i = 1; i < components.length; i += 2) {
                 double stockPrice = Double.parseDouble(components[i]);
@@ -37,9 +36,9 @@ class DataAggregator {
                 money += stockPrice/currencyRate * stockAmounts.get((i-1)/2).doubleValue();
             }
             money = Math.round(money * 100D) / 100D;
-            dateMoney.add(date + "," + money);
+            dateMoney.add(line + "," + money);
         }
-        FileManager.writeList(StockTracker.PATH + "money.csv", dateMoney);
+        FileManager.writeList(StockTracker.PATH + "aggregated_with_money_temp.csv", dateMoney);
     }
 
     private static void aggregate(List<String> ticker_currency) throws IOException {

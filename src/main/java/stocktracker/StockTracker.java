@@ -11,13 +11,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: migrate files to .csv format?
 //TODO: Add more/better jUnit testing
 //TODO: Automatically get currency of stock -- use Yahoo Finance page
 //TODO: Add euro support
 //TODO: Account for dividends using AlphaVantage + add boolean for reinvesting dividends
 //TODO: Add license file? Research about licenses
-//TODO: Aggregate save_data and save_money in a single file
 //TODO: Add proper README
 public class StockTracker {
 
@@ -128,12 +126,10 @@ public class StockTracker {
      * as to not call the APIs too much and improve performance.
      */
     public static void createSave() {
-        List<String> dataList = FileManager.readLines(PATH + "aggregated_temp.csv");
-        List<String> moneyList = FileManager.readLines(PATH + "money.csv");
+        List<String> dataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
         boolean append = false;
         for (int i = 0; i < dataList.size(); i++) {
             FileManager.writeLine(PATH + "save_data.csv", dataList.get(i), append);
-            FileManager.writeLine(PATH + "save_money.csv", moneyList.get(i), append);
             append = true;
         }
     }
@@ -162,12 +158,10 @@ public class StockTracker {
                 updateData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(",")[2]));
             }
             calculateMoney(ticker_currency, stockAmounts);
-            List<String> newDataList = FileManager.readLines(PATH + "aggregated_temp.csv");
-            List<String> newMoneyList = FileManager.readLines(PATH + "money.csv");
+            List<String> newDataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
 
             for (int i = 0; i < newDataList.size(); i++) {
                 FileManager.writeLine(PATH + "save_data.csv", newDataList.get(i), true);
-                FileManager.writeLine(PATH + "save_money.csv", newMoneyList.get(i), true);
             }
         }
         else {

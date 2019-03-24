@@ -196,6 +196,7 @@ public class StockTrackerGUI extends Application {
                 dataList.add(data);
             }
         }
+        createConfig(dataList, amounts);
         calculateMoney(dataList, amounts);
         createSave();
         makeGraphScene(true);
@@ -219,15 +220,15 @@ public class StockTrackerGUI extends Application {
         double money = 0;
         String moneyFile;
         if (newData) {
-            moneyFile = StockTracker.PATH + "money.csv";
+            moneyFile = StockTracker.PATH + "aggregated_with_money_temp.csv";
         }
         else {
-            moneyFile = StockTracker.PATH + "save_money.csv";
+            moneyFile = StockTracker.PATH + "save_data.csv";
         }
 
         for (String line: FileManager.readLines(moneyFile)) {
             String[] splitLine = line.split(",");
-            money = Double.parseDouble(splitLine[1]);
+            money = Double.parseDouble(splitLine[splitLine.length-1]);
             String date = splitLine[0];
             XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(date, money);
             dataPoint.setNode(new HoveredThresholdNode(date, money));
@@ -266,6 +267,10 @@ public class StockTrackerGUI extends Application {
 
     private void updateExistingData() {
         StockTracker.updateSave();
+    }
+
+    private void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
+        StockTracker.createConfig(nameList, amountList);
     }
 
     private void writeData(String ticker, String currencyCode, LocalDate startDate) {
