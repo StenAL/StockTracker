@@ -13,7 +13,7 @@ class DataAggregator {
 
     private static void test() throws IOException {
         ArrayList<String> testList = new ArrayList<>();
-        testList.add("QQ_USD");
+        testList.add("QQQ_USD");
         testList.add("IVV_USD");
         ArrayList<Number> testAmounts = new ArrayList<>();
         testAmounts.add(5);
@@ -23,23 +23,23 @@ class DataAggregator {
 
     static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) throws IOException {
         aggregate(ticker_currency);
-        List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.txt");
+        List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.csv");
         List<String> dateMoney = new ArrayList<>();
         for (String line: finalData) {
-            String[] components = line.split(" ! ");
+            String[] components = line.split(",");
             String date = components[0];
             double money = 0;
-            for (int i = 1; i < components.length; i++) {
-                double stockPrice = Double.parseDouble(components[i].split(" ")[0]);
-                double currencyRate = Double.parseDouble(components[i].split(" ")[1]);
+            for (int i = 1; i < components.length; i += 2) {
+                double stockPrice = Double.parseDouble(components[i]);
+                double currencyRate = Double.parseDouble(components[i+1]);
 
                 //System.out.println(stockPrice + " " + currencyRate);
-                money += stockPrice/currencyRate * stockAmounts.get(i-1).doubleValue();
+                money += stockPrice/currencyRate * stockAmounts.get((i-1)/2).doubleValue();
             }
             money = Math.round(money * 100D) / 100D;
-            dateMoney.add(date + " " + money);
+            dateMoney.add(date + "," + money);
         }
-        FileManager.writeList(StockTracker.PATH + "money.txt", dateMoney);
+        FileManager.writeList(StockTracker.PATH + "money.csv", dateMoney);
     }
 
     private static void aggregate(List<String> ticker_currency) throws IOException {
@@ -49,18 +49,14 @@ class DataAggregator {
         }
         List<String> data;
         try {
-            String dest = workingDir + "aggregated_temp.txt";
-            data = FileManager.readLines(workingDir + "/" + ticker_currency.get(0) + "_temp.txt");
-            for (int i = 0; i < data.size(); i++) {
-                String line = data.get(i);
-                data.set(i, line.substring(0,11) + "! " + line.substring(11));
-            }
+            String dest = workingDir + "aggregated_temp.csv";
+            data = FileManager.readLines(workingDir + "/" + ticker_currency.get(0) + "_temp.csv");
             for (int i = 1; i < ticker_currency.size(); i++) {
-                List<String> fileLines = FileManager.readLines(workingDir + "\\" + ticker_currency.get(i) + "_temp.txt");
+                List<String> fileLines = FileManager.readLines(workingDir + "\\" + ticker_currency.get(i) + "_temp.csv");
                 for (int j = 0; j < fileLines.size(); j++) {
-                    String stockPrice = fileLines.get(j).split(" ")[1];
-                    String currencyRate = fileLines.get(j).split(" ")[2];
-                    data.set(j, data.get(j) + " ! " + stockPrice + " " + currencyRate);
+                    String stockPrice = fileLines.get(j).split(",")[1];
+                    String currencyRate = fileLines.get(j).split(",")[2];
+                    data.set(j, data.get(j) + "," + stockPrice + "," + currencyRate);
                 }
             }
             FileManager.writeList(dest, data);
@@ -85,14 +81,14 @@ class DataAggregator {
         List<String> missingDates = new ArrayList<>();
         List<String> currencyRates = new ArrayList<>();
         List<String> stockRates = new ArrayList<>();
-        for (String line: FileManager.readLines(workingDir + ticker + "_temp.txt")) {
-            stockDates.add(line.split(" ")[0]);
-            stockRates.add(line.split(" ")[1]);
+        for (String line: FileManager.readLines(workingDir + ticker + "_temp.csv")) {
+            stockDates.add(line.split(",")[0]);
+            stockRates.add(line.split(",")[1]);
         }
 
-        for (String line: FileManager.readLines(workingDir + currency + "_temp.txt")) {
-            currencyDates.add(line.split(" ")[0]);
-            currencyRates.add(line.split(" ")[1]);
+        for (String line: FileManager.readLines(workingDir + currency + "_temp.csv")) {
+            currencyDates.add(line.split(",")[0]);
+            currencyRates.add(line.split(",")[1]);
         }
 
         for (String stockDate: stockDates) {
@@ -107,6 +103,7 @@ class DataAggregator {
         }
         Collections.sort(aggregateDates);
         for (String date: missingDates) {
+            //System.out.println(date);
             String missing = date.split(" ")[1];
             date = date.split(" ")[0];
             if (missing.equals("C")) {
@@ -125,10 +122,10 @@ class DataAggregator {
         }
 
 
-        String dest = StockTracker.PATH + ticker + "_" + currency + "_temp.txt";
+        String dest = StockTracker.PATH + ticker + "_" + currency + "_temp.csv";
         List<String> writeList = new ArrayList<>();
         for (int i = 0; i < aggregateDates.size(); i++) {
-            writeList.add(aggregateDates.get(i) + " " + stockRates.get(i) + " " + currencyRates.get(i));
+            writeList.add(aggregateDates.get(i) + "," + stockRates.get(i) + "," + currencyRates.get(i));
         }
         FileManager.writeList(dest, writeList);
 

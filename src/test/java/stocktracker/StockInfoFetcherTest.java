@@ -16,7 +16,7 @@ class StockInfoFetcherTest {
     static synchronized void updateData() {
         StockInfoFetcher.getData("TSLA", LocalDate.now().minusDays(365));
         PATH = StockTracker.PATH;
-        dataList = FileManager.readLines(PATH + "TSLA_temp.txt");
+        dataList = FileManager.readLines(PATH + "TSLA_temp.csv");
     }
 
     @Nested
@@ -32,7 +32,7 @@ class StockInfoFetcherTest {
         @Test
         void testDataValidity() {
             for (String entry : dataList) {
-                String[] splitEntry = entry.split(" ");
+                String[] splitEntry = entry.split(",");
                 assertEquals(splitEntry.length, 2);
                 assertDoesNotThrow(() -> LocalDate.parse(splitEntry[0]));
             }
@@ -45,15 +45,15 @@ class StockInfoFetcherTest {
 
         @Test
         void testFetchingNewData() {
-            File dataFile = new File(PATH + "TSLA_temp.txt");
+            File dataFile = new File(PATH + "TSLA_temp.csv");
             assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
         }
 
         @Test
         void testConfig() {
-            File configFile = new File(PATH + "save_config.txt");
+            File configFile = new File(PATH + "save_config.csv");
             if (configFile.exists()) {
-                String[] config = FileManager.readLines(PATH + "save_config.txt").get(0).split(" ");
+                String[] config = FileManager.readLines(PATH + "save_config.csv").get(0).split(",");
                 assertDoesNotThrow(() -> Integer.parseInt(config[1]));
                 assertDoesNotThrow(() -> Double.parseDouble(config[2]));
             }

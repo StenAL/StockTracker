@@ -58,7 +58,7 @@ public class StockTrackerGUI extends Application {
 
         Button existingButton = new Button("Existing tracker");
         existingButton.setPrefSize(150, 20);
-        existingButton.setDisable(!new File(StockTracker.PATH + "save_config.txt").exists());
+        existingButton.setDisable(!new File(StockTracker.PATH + "save_config.csv").exists());
         existingButton.setOnAction(event -> {
             updateExistingData();
             makeGraphScene(false);
@@ -219,14 +219,14 @@ public class StockTrackerGUI extends Application {
         double money = 0;
         String moneyFile;
         if (newData) {
-            moneyFile = StockTracker.PATH + "money.txt";
+            moneyFile = StockTracker.PATH + "money.csv";
         }
         else {
-            moneyFile = StockTracker.PATH + "save_money.txt";
+            moneyFile = StockTracker.PATH + "save_money.csv";
         }
 
         for (String line: FileManager.readLines(moneyFile)) {
-            String[] splitLine = line.split(" ");
+            String[] splitLine = line.split(",");
             money = Double.parseDouble(splitLine[1]);
             String date = splitLine[0];
             XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(date, money);

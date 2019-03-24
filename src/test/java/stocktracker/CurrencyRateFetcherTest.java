@@ -24,7 +24,7 @@ class CurrencyRateFetcherTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        dataList = FileManager.readLines(PATH + "USD_temp.txt");
+        dataList = FileManager.readLines(PATH + "USD_temp.csv");
     }
 
     @Test
@@ -36,7 +36,7 @@ class CurrencyRateFetcherTest {
     @Test
     void testDataValidity() {
         for (String entry : dataList) {
-            String[] splitEntry = entry.split(" ");
+            String[] splitEntry = entry.split(",");
             assertEquals(splitEntry.length, 2);
             assertDoesNotThrow(() -> LocalDate.parse(splitEntry[0]));
         }
@@ -49,7 +49,7 @@ class CurrencyRateFetcherTest {
 
     @Test
     void testFetchingNewData() {
-        File dataFile = new File(PATH + "USD_temp.txt");
+        File dataFile = new File(PATH + "USD_temp.csv");
         assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
     }
 

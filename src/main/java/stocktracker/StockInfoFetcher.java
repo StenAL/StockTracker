@@ -21,6 +21,8 @@ class StockInfoFetcher {
 
     private static void test() {
         getData("AAPL", LocalDate.now().minusDays(35));
+        //getData("IVV", LocalDate.now().minusDays(365));
+        //getData("QQQ", LocalDate.now().minusDays(365));
     }
 
     static void getData(String ticker, LocalDate startDate, double splitCoefficient) {
@@ -74,21 +76,21 @@ class StockInfoFetcher {
                 dateCloses.put("" + entryDate, "" + money);
             }
         }
-        List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.txt");
+        List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.csv");
         List<String> newConfig = new ArrayList<>();
         for (String line: oldConfig) {
             if (line.startsWith(ticker) && splitCoefficient != 1) {
                 String[] splitLine = line.split(" ");
-                line = splitLine[0] + " " + splitLine[1] + " " + splitCoefficient;
+                line = splitLine[0] + "," + splitLine[1] + "," + splitCoefficient;
             }
             newConfig.add(line);
         }
-        FileManager.writeList(StockTracker.PATH + "save_config.txt", newConfig);
+        FileManager.writeList(StockTracker.PATH + "save_config.csv", newConfig);
         return dateCloses;
     }
 
     private static void writeData(Map<String, String> data, String ticker) {
-        String filename = StockTracker.PATH + ticker + "_temp.txt";
+        String filename = StockTracker.PATH + ticker + "_temp.csv";
         Map<String, String> map = new TreeMap<>(data);
         Set<Map.Entry<String, String>> set2 = map.entrySet();
         Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();
@@ -96,7 +98,7 @@ class StockInfoFetcher {
             boolean append = false;
             while (iterator2.hasNext()) {
                 Map.Entry<String, String> me2 = iterator2.next();
-                String writeLine = me2.getKey()+ " " + me2.getValue();
+                String writeLine = me2.getKey()+ "," + me2.getValue();
                 FileManager.writeLine(filename, writeLine, append);
                 append = true;
             }

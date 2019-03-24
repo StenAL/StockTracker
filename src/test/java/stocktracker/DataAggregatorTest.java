@@ -40,7 +40,7 @@ class DataAggregatorTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        dataList = FileManager.readLines(PATH + "aggregated_temp.txt");
+        dataList = FileManager.readLines(PATH + "aggregated_temp.csv");
     }
 
     @Test
@@ -55,8 +55,8 @@ class DataAggregatorTest {
     @Test
     void testDataValidity() {
         for (String entry : dataList) {
-            String[] splitEntry = entry.split(" ");
-            assertEquals(splitEntry.length, 7);
+            String[] splitEntry = entry.split(",");
+            assertEquals(splitEntry.length, 5);
             assertDoesNotThrow(() -> LocalDate.parse(splitEntry[0]));
         }
     }
@@ -68,15 +68,15 @@ class DataAggregatorTest {
 
     @Test
     void testFetchingNewData() {
-        File dataFile = new File(PATH + "aggregated_temp.txt");
+        File dataFile = new File(PATH + "aggregated_temp.csv");
         assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
     }
 
     @Test
     void testCurrencyAggregation() {
-        List<String> data = FileManager.readLines(PATH + "AAPL_USD_temp.txt");
+        List<String> data = FileManager.readLines(PATH + "AAPL_USD_temp.csv");
         assertTrue(data.size() > 200);
-        assertTrue(new File(PATH + "AAPL_USD_temp.txt").lastModified() > System.currentTimeMillis()-120000);
+        assertTrue(new File(PATH + "AAPL_USD_temp.csv").lastModified() > System.currentTimeMillis()-120000);
     }
 
     @AfterAll

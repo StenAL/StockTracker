@@ -21,9 +21,10 @@ class StockTrackerTest {
 
     @BeforeAll
     static void setup() throws IOException {
-        new FileWriter(new File(PATH + "USD_temp.txt")).write("broken");
-        new FileWriter(new File(PATH + "IVV_temp.txt")).write("broken");
-        new FileWriter(new File(PATH + "QQQ_temp.txt")).write("broken");
+        // ?? some file permissions magic without which the program won't work :(
+        new FileWriter(new File(PATH + "USD_temp.csv")).write("broken");
+        new FileWriter(new File(PATH + "IVV_temp.csv")).write("broken");
+        new FileWriter(new File(PATH + "QQQ_temp.csv")).write("broken");
 
         testList = new ArrayList<>();
         testList.add("IVV_USD");
@@ -47,8 +48,8 @@ class StockTrackerTest {
         StockTracker.deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
-        assertTrue(new File(PATH + "money.txt").exists());
-        assertTrue(new File(PATH + "save_config.txt").exists());
+        assertTrue(new File(PATH + "money.csv").exists());
+        assertTrue(new File(PATH + "save_config.csv").exists());
     }
 
     //TODO: test actually updating the save

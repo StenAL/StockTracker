@@ -18,6 +18,7 @@ import java.util.List;
 //TODO: Account for dividends using AlphaVantage + add boolean for reinvesting dividends
 //TODO: Add license file? Research about licenses
 //TODO: Aggregate save_data and save_money in a single file
+//TODO: Add proper README
 public class StockTracker {
 
     public static final String VERSION = "1.1.2";
@@ -115,8 +116,8 @@ public class StockTracker {
     public static void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
         boolean append = false;
         for (int i = 0; i < nameList.size(); i++) {
-            String line = nameList.get(i) + " " + amountList.get(i) + " 1.0";
-            FileManager.writeLine(PATH + "save_config.txt", line, append);
+            String line = nameList.get(i) + "," + amountList.get(i) + ",1.0";
+            FileManager.writeLine(PATH + "save_config.csv", line, append);
             append = true;
         }
     }
@@ -127,12 +128,12 @@ public class StockTracker {
      * as to not call the APIs too much and improve performance.
      */
     public static void createSave() {
-        List<String> dataList = FileManager.readLines(PATH + "aggregated_temp.txt");
-        List<String> moneyList = FileManager.readLines(PATH + "money.txt");
+        List<String> dataList = FileManager.readLines(PATH + "aggregated_temp.csv");
+        List<String> moneyList = FileManager.readLines(PATH + "money.csv");
         boolean append = false;
         for (int i = 0; i < dataList.size(); i++) {
-            FileManager.writeLine(PATH + "save_data.txt", dataList.get(i), append);
-            FileManager.writeLine(PATH + "save_money.txt", moneyList.get(i), append);
+            FileManager.writeLine(PATH + "save_data.csv", dataList.get(i), append);
+            FileManager.writeLine(PATH + "save_money.csv", moneyList.get(i), append);
             append = true;
         }
     }
@@ -142,31 +143,31 @@ public class StockTracker {
      * @return whether the file is updated or not
      */
     public static boolean updateSave() {
-        List<String> saveConfig = FileManager.readLines(PATH + "save_config.txt");
-        List<String> saveData = FileManager.readLines(PATH + "save_data.txt");
+        List<String> saveConfig = FileManager.readLines(PATH + "save_config.csv");
+        List<String> saveData = FileManager.readLines(PATH + "save_data.csv");
         List<String> ticker_currency = new ArrayList<>();
         List<Number> stockAmounts = new ArrayList<>();
 
-        LocalDate lastDate = LocalDate.parse(saveData.get(saveData.size()-1).split(" ")[0]);
+        LocalDate lastDate = LocalDate.parse(saveData.get(saveData.size()-1).split(",")[0]);
         if (lastDate.isBefore(StockInfoFetcher.getMostRecentDay())) {
             for (String line : saveConfig) {
-                ticker_currency.add(line.split(" ")[0]);
+                ticker_currency.add(line.split(",")[0]);
                 try {
-                    stockAmounts.add(NumberFormat.getInstance().parse(line.split(" ")[1]));
+                    stockAmounts.add(NumberFormat.getInstance().parse(line.split(",")[1]));
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                String[] lineArray = line.split(" ")[0].split("_");
-                updateData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(" ")[2]));
+                String[] lineArray = line.split(",")[0].split("_");
+                updateData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(",")[2]));
             }
             calculateMoney(ticker_currency, stockAmounts);
-            List<String> newDataList = FileManager.readLines(PATH + "aggregated_temp.txt");
-            List<String> newMoneyList = FileManager.readLines(PATH + "money.txt");
+            List<String> newDataList = FileManager.readLines(PATH + "aggregated_temp.csv");
+            List<String> newMoneyList = FileManager.readLines(PATH + "money.csv");
 
             for (int i = 0; i < newDataList.size(); i++) {
-                FileManager.writeLine(PATH + "save_data.txt", newDataList.get(i), true);
-                FileManager.writeLine(PATH + "save_money.txt", newMoneyList.get(i), true);
+                FileManager.writeLine(PATH + "save_data.csv", newDataList.get(i), true);
+                FileManager.writeLine(PATH + "save_money.csv", newMoneyList.get(i), true);
             }
         }
         else {

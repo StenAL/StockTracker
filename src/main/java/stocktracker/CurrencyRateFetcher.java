@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+//TODO: Pad rate to four places after decimal
 class CurrencyRateFetcher {
 
     private final XMLParser xmlParser;
@@ -28,7 +29,7 @@ class CurrencyRateFetcher {
     }
 
     public static void main(String[] args) throws IOException  {
-        writeCurrencyInfo("USD", LocalDate.of(2018, 9, 24));
+        writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
     }
 
     static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) throws IOException {
@@ -38,7 +39,7 @@ class CurrencyRateFetcher {
                 ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
         fetcher.xmlParser.downloadXMLFile(new URL(url_str));
         List<String> dataList = fetcher.xmlParser.parse();
-        FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.txt", dataList);
+        FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.csv", dataList);
         System.out.println("Fetching " + currencyCode + " done");
     }
 
@@ -91,16 +92,16 @@ class CurrencyRateFetcher {
                         Element date = (Element) eElement.getElementsByTagName("ObsDimension").item(0);
                         Element exchangeRate = (Element) eElement.getElementsByTagName("ObsValue").item(0);
 
-                        String line = date.getAttribute("value") + " " + exchangeRate.getAttribute("value");
+                        String line = date.getAttribute("value") + "," + exchangeRate.getAttribute("value");
                         dataList.add(line);
                     }
                 }
                 for (int i = 0; i < dataList.size(); i++) {
                     String entry = dataList.get(i);
                     int count = -1;
-                    while (entry.split(" ")[1].equals("NaN")) {
+                    while (entry.split(",")[1].equals("NaN")) {
                         try {
-                            entry = entry.split(" ")[0] + " " + dataList.get(i+count).split(" ")[1];
+                            entry = entry.split(" ")[0] + "," + dataList.get(i+count).split(" ")[1];
                             dataList.set(i, entry);
                         } catch (IndexOutOfBoundsException e) {
                             count = dataList.size()-i;
