@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,16 +31,35 @@ class CurrencyRateFetcher {
 
     public static void main(String[] args) throws IOException  {
         writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
+        writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
     }
 
     static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) throws IOException {
-        CurrencyRateFetcher fetcher = new CurrencyRateFetcher(currencyCode);
+        if (!currencyCode.equals("EUR")) {
+            CurrencyRateFetcher fetcher = new CurrencyRateFetcher(currencyCode);
 
-        String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
-                ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
-        fetcher.xmlParser.downloadXMLFile(new URL(url_str));
-        List<String> dataList = fetcher.xmlParser.parse();
-        FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.csv", dataList);
+            String url_str = "https://sdw-wsrest.ecb.europa.eu/service/data/EXR/D." + currencyCode +
+                    ".EUR.SP00.A?startPeriod=" + firstDate + "&detail=dataonly";
+            fetcher.xmlParser.downloadXMLFile(new URL(url_str));
+            List<String> dataList = fetcher.xmlParser.parse();
+            //inefficient but works
+            if (currencyCode.equals("EUR")) {
+                for (int i = 0; i < dataList.size(); i++) {
+                    dataList.set(i, dataList.get(i).split(",")[0] + ",1.000");
+                }
+            }
+            FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.csv", dataList);
+        }
+        else {
+            ArrayList<String> dataList = new ArrayList<>();
+            do {
+                if (firstDate.getDayOfWeek() != DayOfWeek.SATURDAY && firstDate.getDayOfWeek() != DayOfWeek.SUNDAY)
+                dataList.add(firstDate +",1.000");
+                firstDate = firstDate.plusDays(1);
+            } while (!firstDate.isEqual(LocalDate.now()));
+            FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.csv", dataList);
+
+        }
         System.out.println("Fetching " + currencyCode + " done");
     }
 

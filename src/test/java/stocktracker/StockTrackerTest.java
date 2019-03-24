@@ -48,7 +48,7 @@ class StockTrackerTest {
         StockTracker.deleteTempFiles();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
-        assertTrue(new File(PATH + "money.csv").exists());
+        assertTrue(new File(PATH + "save_data.csv").exists());
         assertTrue(new File(PATH + "save_config.csv").exists());
     }
 

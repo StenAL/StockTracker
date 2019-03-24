@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,6 +26,22 @@ class CurrencyRateFetcherTest {
             e.printStackTrace();
         }
         dataList = FileManager.readLines(PATH + "USD_temp.csv");
+    }
+
+    @Test
+    void testEuroFetching() {
+        try {
+            CurrencyRateFetcher.writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File dataFile = new File(PATH + "EUR_temp.csv");
+        assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
+        List<String> data = FileManager.readLines(PATH + "EUR_temp.csv");
+        String line = data.get(new Random().nextInt(data.size()-1));
+        assertEquals("1.000", line.split(",")[1]);
+        assertDoesNotThrow(() -> LocalDate.parse(line.split(",")[0]));
+
     }
 
     @Test
