@@ -37,13 +37,10 @@ class DataAggregator {
             }
             money = Math.round(money * 100D) / 100D;
             // Padding with trailing zeroes:
-            // ?? period acting wrong and refusing to split, but works after splitting
             String paddedMoney = "" + money;
-            paddedMoney = paddedMoney.replace(".", "x");
-            while (paddedMoney.split("x")[1].length() < 2) {
+            while (paddedMoney.split("\\.")[1].length() < 2) {
                 paddedMoney = paddedMoney.concat("0");
             }
-            paddedMoney = paddedMoney.replace("x", ".");
             dateMoney.add(line + "," + paddedMoney);
         }
         FileManager.writeList(StockTracker.PATH + "aggregated_with_money_temp.csv", dateMoney);

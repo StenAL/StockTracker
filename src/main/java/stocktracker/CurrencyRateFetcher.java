@@ -112,13 +112,11 @@ class CurrencyRateFetcher {
                         Element exchangeRateElement = (Element) eElement.getElementsByTagName("ObsValue").item(0);
 
                         // Padding with trailing zeroes:
-                        // ?? period acting wrong and refusing to split, but works after splitting
-                        String exchangeRate = exchangeRateElement.getAttribute("value").replace(".", ":");
-                        while (exchangeRate.split(":")[1].length() < 4) {
+                        String exchangeRate = exchangeRateElement.getAttribute("value");
+                        while (exchangeRate.split("\\.")[1].length() < 4) {
                             exchangeRate = exchangeRate.concat("0");
                         }
-
-                        String line = dateElement.getAttribute("value") + "," + exchangeRate.replace(":", ".");
+                        String line = dateElement.getAttribute("value") + "," + exchangeRate;
                         dataList.add(line);
                     }
                 }

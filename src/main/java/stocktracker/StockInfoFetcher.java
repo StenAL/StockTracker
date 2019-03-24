@@ -75,12 +75,9 @@ class StockInfoFetcher {
 
                 // Padding with trailing zeroes:
                 String actualPrice = "" + Math.round(stock.getClose()*splitCoefficient*100)/100.0;
-                // ?? period acting wrong and refusing to split, but works after splitting
-                actualPrice = actualPrice.replace(".", ":");
-                while (actualPrice.split(":")[1].length() < 2) {
+                while (actualPrice.split("\\.")[1].length() < 2) {
                     actualPrice = actualPrice.concat("0");
                 }
-                actualPrice = actualPrice.replace(":", ".");
 
                 dateCloses.put("" + entryDate, "" + actualPrice);
             }
