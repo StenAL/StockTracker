@@ -46,7 +46,7 @@ public class StockTrackerGUI extends Application {
     private void setupStartScene()
     {
         stocksTracked = new ArrayList<>();
-        primaryStage.setTitle("Stock tracker");
+        primaryStage.setTitle("StockTracker");
         primaryStage.getIcons().add(new Image("icon.png"));
         statusLabel = new Label("");
         width = (int) Screen.getPrimary().getBounds().getWidth()/2;

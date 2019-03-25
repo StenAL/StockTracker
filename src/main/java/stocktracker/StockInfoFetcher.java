@@ -82,16 +82,22 @@ class StockInfoFetcher {
                 dateCloses.put("" + entryDate, "" + actualPrice);
             }
         }
-        List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.csv");
-        List<String> newConfig = new ArrayList<>();
-        for (String line: oldConfig) {
-            if (line.startsWith(ticker) && splitCoefficient != 1) {
-                String[] splitLine = line.split(" ");
-                line = splitLine[0] + "," + splitLine[1] + "," + splitCoefficient;
+
+        // needed for first time startup when no config file exists yet
+        try {
+            List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.csv");
+            List<String> newConfig = new ArrayList<>();
+            for (String line: oldConfig) {
+                if (line.startsWith(ticker) && splitCoefficient != 1) {
+                    String[] splitLine = line.split(" ");
+                    line = splitLine[0] + "," + splitLine[1] + "," + splitCoefficient;
+                }
+                newConfig.add(line);
             }
-            newConfig.add(line);
+            FileManager.writeList(StockTracker.PATH + "save_config.csv", newConfig);
+        } catch (Exception e) {
+            //e.printStackTrace();
         }
-        FileManager.writeList(StockTracker.PATH + "save_config.csv", newConfig);
         return dateCloses;
     }
 
