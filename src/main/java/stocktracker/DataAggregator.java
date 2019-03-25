@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+//TODO: add unit tests
 class DataAggregator {
-    // TODO: Padding money and stock decimal places with zeroes
     public static void main(String[] args) throws IOException {
         test();
     }
@@ -21,8 +22,8 @@ class DataAggregator {
         calculateMoney(testList, testAmounts);
     }
 
-    static void calculateMoney(List<String> ticker_currency, List<Number> stockAmounts) throws IOException {
-        aggregate(ticker_currency);
+    static void calculateMoney(List<String> tickers, List<Number> stockAmounts) throws IOException {
+        aggregate(tickers);
         List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.csv");
         List<String> dateMoney = new ArrayList<>();
         for (String line: finalData) {
@@ -32,33 +33,32 @@ class DataAggregator {
                 double stockPrice = Double.parseDouble(components[i]);
                 double currencyRate = Double.parseDouble(components[i+1]);
 
-                //System.out.println(stockPrice + " " + currencyRate);
                 money += stockPrice/currencyRate * stockAmounts.get((i-1)/2).doubleValue();
             }
             money = Math.round(money * 100D) / 100D;
-            dateMoney.add(line + "," + money);
+            // Padding with trailing zeroes:
+            String paddedMoney = "" + money;
+            while (paddedMoney.split("\\.")[1].length() < 2) {
+                paddedMoney = paddedMoney.concat("0");
+            }
+            dateMoney.add(line + "," + paddedMoney);
         }
         FileManager.writeList(StockTracker.PATH + "aggregated_with_money_temp.csv", dateMoney);
     }
 
-    private static void aggregate(List<String> ticker_currency) throws IOException {
-        String workingDir = StockTracker.PATH;
-        for (String combination: ticker_currency) {
-            aggregate(combination);
-        }
+    private static void aggregate(List<String> tickers) throws IOException {
         List<String> data;
         try {
-            String dest = workingDir + "aggregated_temp.csv";
-            data = FileManager.readLines(workingDir + "/" + ticker_currency.get(0) + "_temp.csv");
-            for (int i = 1; i < ticker_currency.size(); i++) {
-                List<String> fileLines = FileManager.readLines(workingDir + "\\" + ticker_currency.get(i) + "_temp.csv");
+            data = FileManager.readLines(StockTracker.PATH + tickers.get(0) + "_currency_temp.csv");
+            for (int i = 1; i < tickers.size(); i++) {
+                List<String> fileLines = FileManager.readLines(StockTracker.PATH + tickers.get(i) + "_currency_temp.csv");
                 for (int j = 0; j < fileLines.size(); j++) {
                     String stockPrice = fileLines.get(j).split(",")[1];
                     String currencyRate = fileLines.get(j).split(",")[2];
                     data.set(j, data.get(j) + "," + stockPrice + "," + currencyRate);
                 }
             }
-            FileManager.writeList(dest, data);
+            FileManager.writeList(StockTracker.PATH + "aggregated_temp.csv", data);
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,7 +70,7 @@ class DataAggregator {
      * on dates with no values. If the first day of the whole file happens to be a market
      * holiday then we use the next available day's close value instead.
      */
-    private static void aggregate(String ticker_currency) throws IOException {
+    static void aggregate(String ticker_currency) throws IOException {
         String workingDir = StockTracker.PATH;
         String ticker = ticker_currency.split("_")[0];
         String currency = ticker_currency.split("_")[1];
@@ -121,7 +121,7 @@ class DataAggregator {
         }
 
 
-        String dest = StockTracker.PATH + ticker + "_" + currency + "_temp.csv";
+        String dest = StockTracker.PATH + ticker + "_currency_temp.csv";
         List<String> writeList = new ArrayList<>();
         for (int i = 0; i < aggregateDates.size(); i++) {
             writeList.add(aggregateDates.get(i) + "," + stockRates.get(i) + "," + currencyRates.get(i));

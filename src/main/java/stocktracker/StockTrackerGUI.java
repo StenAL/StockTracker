@@ -11,13 +11,14 @@ import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
+import yahoofinance.YahooFinance;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-//TODO: Add progress bars?
+//TODO: Add progress bars/loading indication
 
 public class StockTrackerGUI extends Application {
     private Stage primaryStage;
@@ -46,7 +47,7 @@ public class StockTrackerGUI extends Application {
     private void setupStartScene()
     {
         stocksTracked = new ArrayList<>();
-        primaryStage.setTitle("Stock tracker");
+        primaryStage.setTitle("StockTracker");
         primaryStage.getIcons().add(new Image("icon.png"));
         statusLabel = new Label("");
         width = (int) Screen.getPrimary().getBounds().getWidth()/2;
@@ -68,7 +69,7 @@ public class StockTrackerGUI extends Application {
 
         BorderPane mainPane = new BorderPane();
 
-        Label topLabel = new Label("Stock Tracker");
+        Label topLabel = new Label("StockTracker");
         topLabel.setStyle("-fx-font-size: 3em;");
         VBox topNode = new VBox(topLabel);
         mainPane.setTop(topNode);
@@ -127,9 +128,8 @@ public class StockTrackerGUI extends Application {
             alert.setTitle("How to use StockTracker");
             alert.setContentText("1. Press 'New Tracker'\n2. Choose the date you wish to start" +
                     " tracking the stocks from\n3. Write down the stock you wish to track " +
-                    "and what currency it's traded in (e.g. AAPL_USD) in the ticker_currency field. " +
-                    "Write how much of that stock you own in the amount field." +
-                    "\n4. Press 'Go!'");
+                    "(e.g. AAPL_USD) in the ticker field. Write how much of that stock" +
+                    "you own in the amount field.\n4. Press 'Go!'");
             new JMetro(JMetro.Style.LIGHT).applyTheme(stage.getScene());
             alert.showAndWait();});
         helpMenu.getItems().addAll(aboutItem, howToUseItem);
@@ -165,7 +165,7 @@ public class StockTrackerGUI extends Application {
         inputDataBox.getChildren().addAll(inputLabel);
         ExtendableTextField tickerCurrencyTextField = new ExtendableTextField(inputDataBox);
         tickerCurrencyTextField.setMaxWidth(200);
-        tickerCurrencyTextField.setPromptText("ticker_currency");
+        tickerCurrencyTextField.setPromptText("ticker");
 
 
         inputDataBox.setAlignment(Pos.CENTER);
@@ -187,8 +187,8 @@ public class StockTrackerGUI extends Application {
         for (ExtendableTextField field: stocksTracked) {
             String data = field.getText();
             if (data.length() > 0) {
-                writeData(data.split("_")[0], data.split("_")[1], startDate);
                 try {
+                    writeData(data, startDate);
                     amounts.add(NumberFormat.getInstance().parse(field.amountField.getText()));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -273,9 +273,9 @@ public class StockTrackerGUI extends Application {
         StockTracker.createConfig(nameList, amountList);
     }
 
-    private void writeData(String ticker, String currencyCode, LocalDate startDate) {
+    private void writeData(String ticker, LocalDate startDate) {
         setStatusLabel("Fetching " + ticker + " data...");
-        StockTracker.writeData(ticker, currencyCode, startDate);
+        StockTracker.writeData(ticker, startDate);
     }
 
     private static void createSave() {
@@ -344,7 +344,7 @@ public class StockTrackerGUI extends Application {
             });
             amountField = new TextField();
             amountField.setMaxWidth(70);
-            amountField.setPromptText("Amount");
+            amountField.setPromptText("amount");
             container.getChildren().addAll(this, amountField);
             root.getChildren().addAll(container);
         }

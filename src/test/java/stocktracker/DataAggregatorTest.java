@@ -10,6 +10,7 @@ import java.nio.file.InvalidPathException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,37 +20,36 @@ class DataAggregatorTest {
     private static List<String> dataList;
 
     @BeforeAll
-    static void updateData() {
-        try {
-            StockInfoFetcher.getData("AAPL", LocalDate.now().minusDays(365));
-            StockInfoFetcher.getData("MSFT", LocalDate.now().minusDays(365));
-            CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    static void updateData() throws IOException {
+        StockInfoFetcher.getData("AAPL", LocalDate.now().minusDays(139));
+        StockInfoFetcher.getData("MSFT", LocalDate.now().minusDays(139));
+        CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(139));
+        DataAggregator.aggregate("AAPL_USD");
+        DataAggregator.aggregate("MSFT_USD");
 
         ArrayList<String> testList = new ArrayList<>();
-        testList.add("AAPL_USD");
-        testList.add("MSFT_USD");
+        testList.add("AAPL");
+        testList.add("MSFT");
         ArrayList<Number> testAmounts = new ArrayList<>();
         testAmounts.add(5);
         testAmounts.add(10);
-        try {
-            System.out.println(testList + " " + testAmounts);
-            DataAggregator.calculateMoney(testList, testAmounts);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        DataAggregator.calculateMoney(testList, testAmounts);
         dataList = FileManager.readLines(PATH + "aggregated_temp.csv");
     }
 
     @Test
     void testInvalidData() {
-        List<String> invalidList = new ArrayList<>();
-        invalidList.add("AAAPL_USD");
-        List<Number> amounts = new ArrayList<>();
-        amounts.add(1);
-        assertThrows(InvalidPathException.class, () -> DataAggregator.calculateMoney(invalidList, amounts));
+        assertThrows(InvalidPathException.class, () -> DataAggregator.aggregate("AAAPL_USD"));
+    }
+
+    @Test
+    void testSingleAggregation() {
+        File dataFile = new File(PATH + "AAPL_currency_temp.csv");
+        assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
+        List<String> data = FileManager.readLines(PATH + "AAPL_currency_temp.csv");
+        String line = data.get(new Random().nextInt(data.size()-1));
+        assertEquals(3, line.split(",").length);
+        assertDoesNotThrow(() -> LocalDate.parse(line.split(",")[0]));
     }
 
     @Test
@@ -63,7 +63,7 @@ class DataAggregatorTest {
 
     @Test
     void testDataSize() {
-        assertTrue(dataList.size() > 200);
+        assertTrue(dataList.size() > 80);
     }
 
     @Test
@@ -72,15 +72,8 @@ class DataAggregatorTest {
         assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
     }
 
-    @Test
-    void testCurrencyAggregation() {
-        List<String> data = FileManager.readLines(PATH + "AAPL_USD_temp.csv");
-        assertTrue(data.size() > 200);
-        assertTrue(new File(PATH + "AAPL_USD_temp.csv").lastModified() > System.currentTimeMillis()-120000);
-    }
-
     @AfterAll
     static void teardown() throws InterruptedException {
-        Thread.sleep(20000);
+        Thread.sleep(15000);
     }
 }

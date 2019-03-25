@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-//TODO: Pad rate to four places after decimal
 class CurrencyRateFetcher {
 
     private final XMLParser xmlParser;
@@ -73,6 +72,9 @@ class CurrencyRateFetcher {
                 connection.setRequestProperty("Accept", "text/xml");
 
                 System.out.println("Response code: " + connection.getResponseCode());
+                if (connection.getResponseCode() != 200) {
+                    System.out.println("Error fetching '" +currencyCode + "'");
+                }
                 String readStream = readStream(connection.getInputStream());
                 try {
                     List<String> lines = Arrays.asList(readStream.split("\n"));
@@ -109,10 +111,15 @@ class CurrencyRateFetcher {
 
                         Element eElement = (Element) nNode;
 
-                        Element date = (Element) eElement.getElementsByTagName("ObsDimension").item(0);
-                        Element exchangeRate = (Element) eElement.getElementsByTagName("ObsValue").item(0);
+                        Element dateElement = (Element) eElement.getElementsByTagName("ObsDimension").item(0);
+                        Element exchangeRateElement = (Element) eElement.getElementsByTagName("ObsValue").item(0);
 
-                        String line = date.getAttribute("value") + "," + exchangeRate.getAttribute("value");
+                        // Padding with trailing zeroes:
+                        String exchangeRate = exchangeRateElement.getAttribute("value");
+                        while (exchangeRate.split("\\.")[1].length() < 4) {
+                            exchangeRate = exchangeRate.concat("0");
+                        }
+                        String line = dateElement.getAttribute("value") + "," + exchangeRate;
                         dataList.add(line);
                     }
                 }
