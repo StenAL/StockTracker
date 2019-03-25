@@ -2,7 +2,7 @@
 
 Calls various APIs to get data on stock prices and currency rates, which it then uses to convert user input in the form of stock and amount owned to total value of portfolio in euros over time. The value of the portfolio is graphed using a JavaFX GUI.
 
-[Graph showing 1 AAPL stock owned from March 1st to Match 25th 2019](example.png)
+![Graph showing 1 AAPL stock owned from March 1st to Match 25th 2019](example.png)
 
 ## Getting Started
 
