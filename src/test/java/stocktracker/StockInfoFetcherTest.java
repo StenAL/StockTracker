@@ -14,7 +14,7 @@ class StockInfoFetcherTest {
     private static List<String> dataList;
     @BeforeAll
     static synchronized void updateData() {
-        StockInfoFetcher.getData("TSLA", LocalDate.now().minusDays(365));
+        StockInfoFetcher.getData("TSLA", LocalDate.now().minusDays(139));
         PATH = StockTracker.PATH;
         dataList = FileManager.readLines(PATH + "TSLA_temp.csv");
     }
@@ -26,7 +26,7 @@ class StockInfoFetcherTest {
         @Test
         void testInvalidTicker() {
             assertThrows(AlphaVantageException.class, () -> StockInfoFetcher
-                    .getData("STEN", LocalDate.now().minusDays(365)));
+                    .getData("STEN", LocalDate.now().minusDays(139)));
         }
 
         @Test
@@ -40,7 +40,7 @@ class StockInfoFetcherTest {
 
         @Test
         void testDataSize() {
-            assertTrue(dataList.size() > 200);
+            assertTrue(dataList.size() > 80);
         }
 
         @Test
@@ -70,6 +70,6 @@ class StockInfoFetcherTest {
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        Thread.sleep(20000);
+        Thread.sleep(15000);
     }
 }

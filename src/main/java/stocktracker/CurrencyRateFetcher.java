@@ -72,6 +72,9 @@ class CurrencyRateFetcher {
                 connection.setRequestProperty("Accept", "text/xml");
 
                 System.out.println("Response code: " + connection.getResponseCode());
+                if (connection.getResponseCode() != 200) {
+                    System.out.println("Error fetching '" +currencyCode + "'");
+                }
                 String readStream = readStream(connection.getInputStream());
                 try {
                     List<String> lines = Arrays.asList(readStream.split("\n"));

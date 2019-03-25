@@ -21,14 +21,9 @@ class StockTrackerTest {
 
     @BeforeAll
     static void setup() throws IOException {
-        // ?? some file permissions magic without which the program won't work :(
-        new FileWriter(new File(PATH + "USD_temp.csv")).write("broken");
-        new FileWriter(new File(PATH + "IVV_temp.csv")).write("broken");
-        new FileWriter(new File(PATH + "QQQ_temp.csv")).write("broken");
-
         testList = new ArrayList<>();
-        testList.add("IVV_USD");
-        testList.add("QQQ_USD");
+        testList.add("IVV");
+        testList.add("QQQ");
         testAmounts = new ArrayList<>();
         testAmounts.add(5);
         testAmounts.add(10);
@@ -39,7 +34,7 @@ class StockTrackerTest {
     {
         StockTracker.createConfig(testList, testAmounts);
         StockTracker.writeData("IVV", LocalDate.now().minusDays(139));
-        StockTracker.writeData("QQQ",LocalDate.now().minusDays(139));
+        StockTracker.writeData("QQQ", LocalDate.now().minusDays(139));
 
         System.out.println("Data fetching done");
         System.out.println("$$$");
@@ -50,6 +45,7 @@ class StockTrackerTest {
         System.out.println("Done");
         assertTrue(new File(PATH + "save_data.csv").exists());
         assertTrue(new File(PATH + "save_config.csv").exists());
+        assertFalse(StockTracker.updateSave());
     }
 
     //TODO: test actually updating the save

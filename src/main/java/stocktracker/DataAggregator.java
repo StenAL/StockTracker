@@ -47,20 +47,18 @@ class DataAggregator {
     }
 
     private static void aggregate(List<String> tickers) throws IOException {
-        String workingDir = StockTracker.PATH;
         List<String> data;
         try {
-            String dest = workingDir + "aggregated_temp.csv";
-            data = FileManager.readLines(workingDir + "/" + tickers.get(0) + "_currency_temp.csv");
+            data = FileManager.readLines(StockTracker.PATH + tickers.get(0) + "_currency_temp.csv");
             for (int i = 1; i < tickers.size(); i++) {
-                List<String> fileLines = FileManager.readLines(workingDir + "\\" + tickers.get(i) + "_currency_temp.csv");
+                List<String> fileLines = FileManager.readLines(StockTracker.PATH + tickers.get(i) + "_currency_temp.csv");
                 for (int j = 0; j < fileLines.size(); j++) {
                     String stockPrice = fileLines.get(j).split(",")[1];
                     String currencyRate = fileLines.get(j).split(",")[2];
                     data.set(j, data.get(j) + "," + stockPrice + "," + currencyRate);
                 }
             }
-            FileManager.writeList(dest, data);
+            FileManager.writeList(StockTracker.PATH + "aggregated_temp.csv", data);
         }catch (Exception e) {
             e.printStackTrace();
         }

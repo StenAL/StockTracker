@@ -61,6 +61,19 @@ public class StockTracker {
     }
 
     /**
+     * @param nameList List of tickers of stocks.
+     * @param amountList List containing amounts of stocks specified in nameList owned.
+     */
+    public static void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
+        boolean append = false;
+        for (int i = 0; i < nameList.size(); i++) {
+            String line = nameList.get(i) + "," + amountList.get(i) + ",1.0";
+            FileManager.writeLine(PATH + "save_config.csv", line, append);
+            append = true;
+        }
+    }
+
+    /**
      * Writes data of a specified stock and its trading currency to a csv file.
      * @param ticker Ticker of the stock to be recorded.
      * @param startDate First date the data is written from.
@@ -101,19 +114,6 @@ public class StockTracker {
             DataAggregator.calculateMoney(tickers, stockAmounts);
         } catch (IOException e) {
             System.out.println("Something went horrendously wrong");
-        }
-    }
-
-    /**
-     * @param nameList List of tickers of stocks.
-     * @param amountList List containing amounts of stocks specified in nameList owned.
-     */
-    public static void createConfig(ArrayList<String> nameList, ArrayList<Number> amountList) {
-        boolean append = false;
-        for (int i = 0; i < nameList.size(); i++) {
-            String line = nameList.get(i) + "," + amountList.get(i) + ",1.0";
-            FileManager.writeLine(PATH + "save_config.csv", line, append);
-            append = true;
         }
     }
 

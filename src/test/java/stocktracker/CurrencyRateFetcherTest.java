@@ -19,29 +19,20 @@ class CurrencyRateFetcherTest {
     private static List<String> dataList;
 
     @BeforeAll
-    static void setUp() {
-        try {
-            CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    static void setUp() throws IOException {
+        CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
         dataList = FileManager.readLines(PATH + "USD_temp.csv");
     }
 
     @Test
-    void testEuroFetching() {
-        try {
-            CurrencyRateFetcher.writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    void testEuroFetching() throws IOException {
+        CurrencyRateFetcher.writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
         File dataFile = new File(PATH + "EUR_temp.csv");
         assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
         List<String> data = FileManager.readLines(PATH + "EUR_temp.csv");
         String line = data.get(new Random().nextInt(data.size()-1));
         assertEquals("1.000", line.split(",")[1]);
         assertDoesNotThrow(() -> LocalDate.parse(line.split(",")[0]));
-
     }
 
     @Test
@@ -72,6 +63,6 @@ class CurrencyRateFetcherTest {
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        Thread.sleep(20000);
+        Thread.sleep(15000);
     }
 }
