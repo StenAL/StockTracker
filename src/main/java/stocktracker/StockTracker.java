@@ -1,6 +1,7 @@
 package stocktracker;
 
 import org.patriques.output.AlphaVantageException;
+import yahoofinance.YahooFinance;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,15 +39,15 @@ public class StockTracker {
     {
         System.out.println("$$$");
         ArrayList<String> testList = new ArrayList<>();
-        testList.add("IVV_USD");
-        testList.add("QQQ_USD");
+        testList.add("IVV");
+        testList.add("QQQ");
         ArrayList<Number> testAmounts = new ArrayList<>();
         testAmounts.add(5);
         testAmounts.add(10);
         createConfig(testList, testAmounts);
         //writeData("IVV", "USD", LocalDate.of(2018, 9, 24));
-        writeData("IVV", "USD", LocalDate.now().minusDays(139));
-        writeData("QQQ", "USD", LocalDate.now().minusDays(139));
+        writeData("IVV", LocalDate.now().minusDays(139));
+        writeData("QQQ", LocalDate.now().minusDays(139));
 
         System.out.println("Data fetching done");
         System.out.println("$$$");
@@ -64,13 +65,15 @@ public class StockTracker {
     /**
      * Writes data of a specified stock and currency to text files.
      * @param ticker Ticker of the stock to be recorded.
-     * @param currencyCode Currcency code of currency to be recorded.
      * @param startDate First date the data is written from.
      */
-    public static void writeData(String ticker, String currencyCode, LocalDate startDate) {
+    public static void writeData(String ticker, LocalDate startDate) {
+        String currencyCode = null;
         try {
             StockInfoFetcher.getData(ticker, startDate);
+            currencyCode = YahooFinance.get(ticker).getCurrency();
             CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
+            DataAggregator.aggregate(ticker + "_" + currencyCode);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
         } catch (IOException e) {
@@ -78,9 +81,11 @@ public class StockTracker {
         }
     }
 
-    public static void updateData(String ticker, String currencyCode, LocalDate startDate, double splitCoefficient) {
+    public static void updateData(String ticker, LocalDate startDate, double splitCoefficient) {
+        String currencyCode = null;
         try {
             StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
+            currencyCode = YahooFinance.get(ticker).getCurrency();
             CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
@@ -152,7 +157,7 @@ public class StockTracker {
                     e.printStackTrace();
                 }
                 String[] lineArray = line.split(",")[0].split("_");
-                updateData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(",")[2]));
+                //updateData(lineArray[0], lineArray[1], lastDate.plusDays(1), Double.parseDouble(line.split(",")[2]));
             }
             calculateMoney(ticker_currency, stockAmounts);
             List<String> newDataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");

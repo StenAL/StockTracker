@@ -50,6 +50,11 @@
             <version>5.3.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yahoofinance-api</groupId>
+            <artifactId>YahooFinanceAPI</artifactId>
+            <version>3.14.0</version>
+        </dependency>
     </dependencies>
     <scm>
         <connection>scm:git:https://github.com/StenAL/StockTracker</connection>

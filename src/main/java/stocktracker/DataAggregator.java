@@ -75,7 +75,7 @@ class DataAggregator {
      * on dates with no values. If the first day of the whole file happens to be a market
      * holiday then we use the next available day's close value instead.
      */
-    private static void aggregate(String ticker_currency) throws IOException {
+    public static void aggregate(String ticker_currency) throws IOException {
         String workingDir = StockTracker.PATH;
         String ticker = ticker_currency.split("_")[0];
         String currency = ticker_currency.split("_")[1];

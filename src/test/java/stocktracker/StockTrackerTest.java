@@ -38,8 +38,8 @@ class StockTrackerTest {
     void runNewTest()
     {
         StockTracker.createConfig(testList, testAmounts);
-        StockTracker.writeData("IVV", "USD", LocalDate.now().minusDays(139));
-        StockTracker.writeData("QQQ", "USD", LocalDate.now().minusDays(139));
+        StockTracker.writeData("IVV", LocalDate.now().minusDays(139));
+        StockTracker.writeData("QQQ",LocalDate.now().minusDays(139));
 
         System.out.println("Data fetching done");
         System.out.println("$$$");

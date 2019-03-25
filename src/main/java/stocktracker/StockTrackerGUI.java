@@ -11,13 +11,14 @@ import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
+import yahoofinance.YahooFinance;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-//TODO: Add progress bars?
+//TODO: Add progress bars/loading indication
 
 public class StockTrackerGUI extends Application {
     private Stage primaryStage;
@@ -187,8 +188,8 @@ public class StockTrackerGUI extends Application {
         for (ExtendableTextField field: stocksTracked) {
             String data = field.getText();
             if (data.length() > 0) {
-                writeData(data.split("_")[0], data.split("_")[1], startDate);
                 try {
+                    writeData(data, YahooFinance.get(data).getCurrency(), startDate);
                     amounts.add(NumberFormat.getInstance().parse(field.amountField.getText()));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -275,7 +276,7 @@ public class StockTrackerGUI extends Application {
 
     private void writeData(String ticker, String currencyCode, LocalDate startDate) {
         setStatusLabel("Fetching " + ticker + " data...");
-        StockTracker.writeData(ticker, currencyCode, startDate);
+        StockTracker.writeData(ticker, startDate);
     }
 
     private static void createSave() {
