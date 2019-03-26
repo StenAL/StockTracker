@@ -18,7 +18,7 @@
     </repository>
     <repository>
         <id>0002</id>
-        <name>xml-parser</name>
+        <name>mulesoft (for xmlparser</name>
         <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
     </repository>
     </repositories>
@@ -138,14 +138,14 @@
                             </jre>
                             <versionInfo>
                                 <fileVersion>1.2.3.4</fileVersion>
-                                <txtFileVersion>txt file version?</txtFileVersion>
+                                <txtFileVersion>1.2.3.4</txtFileVersion>
                                 <fileDescription>StockTracker</fileDescription>
-                                <copyright>my copyright</copyright>
+                                <copyright>MIT License</copyright>
                                 <productVersion>4.3.2.1</productVersion>
-                                <txtProductVersion>txt product version</txtProductVersion>
+                                <txtProductVersion>4.3.2.1</txtProductVersion>
                                 <productName>S-T-E-N</productName>
                                 <internalName>ccne</internalName>
-                                <originalFilename>original.exe</originalFilename>
+                                <originalFilename>StockTracker.exe</originalFilename>
                             </versionInfo>
                         </configuration>
                     </execution>

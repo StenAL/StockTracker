@@ -14,6 +14,7 @@
 
     <fileSets>
         <fileSet>
+
             <outputDirectory></outputDirectory>
             <directory>${project.build.directory}</directory>
             <!--To include single file into the zip -->
@@ -23,5 +24,4 @@
             </includes>
         </fileSet>
     </fileSets>
-
 </assembly>

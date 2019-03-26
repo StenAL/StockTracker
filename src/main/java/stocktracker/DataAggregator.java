@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-//TODO: add unit tests
+//TODO: add unit tests for aggregate()
 class DataAggregator {
     public static void main(String[] args) throws IOException {
         test();

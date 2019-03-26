@@ -8,10 +8,10 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.paint.ImagePattern;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
-import yahoofinance.YahooFinance;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 
 public class StockTrackerGUI extends Application {
     private Stage primaryStage;
-    private Label statusLabel;
     private int width;
     private int height;
     private ArrayList<ExtendableTextField> stocksTracked;
@@ -49,13 +48,13 @@ public class StockTrackerGUI extends Application {
         stocksTracked = new ArrayList<>();
         primaryStage.setTitle("StockTracker");
         primaryStage.getIcons().add(new Image("icon.png"));
-        statusLabel = new Label("");
         width = (int) Screen.getPrimary().getBounds().getWidth()/2;
         height = (int) Screen.getPrimary().getBounds().getHeight()/2;
 
         Button newButton = new Button("New tracker");
         newButton.setPrefSize(150, 20);
         newButton.setOnAction(event -> setupNewTrackerScene());
+        new JMetro(JMetro.Style.DARK).applyTheme(newButton);
 
         Button existingButton = new Button("Existing tracker");
         existingButton.setPrefSize(150, 20);
@@ -64,13 +63,14 @@ public class StockTrackerGUI extends Application {
             updateExistingData();
             makeGraphScene(false);
         });
+        new JMetro(JMetro.Style.DARK).applyTheme(existingButton);
 
         VBox root = new VBox();
 
         BorderPane mainPane = new BorderPane();
 
         Label topLabel = new Label("StockTracker");
-        topLabel.setStyle("-fx-font-size: 3em;");
+        topLabel.setStyle("-fx-font-size: 4em; -fx-text-fill: ivory; -fx-font-family: 'Alegreya Sans SC Medium';");
         VBox topNode = new VBox(topLabel);
         mainPane.setTop(topNode);
         topNode.setAlignment(Pos.CENTER);
@@ -82,13 +82,15 @@ public class StockTrackerGUI extends Application {
         centerNode.setAlignment(Pos.CENTER);
         mainPane.setCenter(centerNode);
 
-        setStatusLabel("Ready...");
-
         setupMenuBar(root);
 
         Region region = new Region();
-        root.getChildren().addAll(mainPane, region, statusLabel);
+        root.getChildren().addAll(mainPane, region);
         VBox.setVgrow(region, Priority.ALWAYS);
+
+        Image image = new Image("background.jpg");
+        BackgroundFill backgroundFill = new BackgroundFill(new ImagePattern(image), CornerRadii.EMPTY, Insets.EMPTY);
+        root.setBackground(new Background(backgroundFill));
 
         createScene(root);
     }
@@ -128,7 +130,7 @@ public class StockTrackerGUI extends Application {
             alert.setTitle("How to use StockTracker");
             alert.setContentText("1. Press 'New Tracker'\n2. Choose the date you wish to start" +
                     " tracking the stocks from\n3. Write down the stock you wish to track " +
-                    "(e.g. AAPL_USD) in the ticker field. Write how much of that stock" +
+                    "(e.g. AAPL) in the ticker field. Write how much of that stock " +
                     "you own in the amount field.\n4. Press 'Go!'");
             new JMetro(JMetro.Style.LIGHT).applyTheme(stage.getScene());
             alert.showAndWait();});
@@ -237,6 +239,7 @@ public class StockTrackerGUI extends Application {
         lineChart.setCreateSymbols(false);
         lineChart.setLegendVisible(false);
         lineChart.getData().add(series);
+        System.out.println("asd");
 
         HBox hBox = new HBox();
         Label label = new Label("Total ca$h: ");
@@ -249,9 +252,8 @@ public class StockTrackerGUI extends Application {
         hBox.setAlignment(Pos.CENTER);
 
         Region region = new Region();
-        root.getChildren().addAll(lineChart, hBox, region, statusLabel);
+        root.getChildren().addAll(lineChart, hBox, region);
         VBox.setVgrow(region, Priority.ALWAYS);
-        setStatusLabel("Done...");
 
         createScene(root);
     }
@@ -259,10 +261,6 @@ public class StockTrackerGUI extends Application {
     @Override
     public void stop(){
         deleteTempFiles();
-    }
-
-    private void setStatusLabel(String newProgress) {
-        statusLabel.setText(newProgress);
     }
 
     private void updateExistingData() {
@@ -274,7 +272,6 @@ public class StockTrackerGUI extends Application {
     }
 
     private void writeData(String ticker, LocalDate startDate) {
-        setStatusLabel("Fetching " + ticker + " data...");
         StockTracker.writeData(ticker, startDate);
     }
 
@@ -283,7 +280,6 @@ public class StockTrackerGUI extends Application {
     }
 
     private void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts) {
-        setStatusLabel("Aggregating data..." );
         StockTracker.calculateMoney(ticker_currency, stockAmounts);
     }
 

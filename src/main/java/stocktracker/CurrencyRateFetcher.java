@@ -29,8 +29,9 @@ class CurrencyRateFetcher {
     }
 
     public static void main(String[] args) throws IOException  {
-        writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
-        writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
+        writeCurrencyInfo("USD", LocalDate.of(2008, 03, 02));
+        //writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
+        //writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
     }
 
     static void writeCurrencyInfo(String currencyCode, LocalDate firstDate) throws IOException {
@@ -116,8 +117,11 @@ class CurrencyRateFetcher {
 
                         // Padding with trailing zeroes:
                         String exchangeRate = exchangeRateElement.getAttribute("value");
-                        while (exchangeRate.split("\\.")[1].length() < 4) {
-                            exchangeRate = exchangeRate.concat("0");
+                        if (!exchangeRate.equals("NaN")) {
+                            while (exchangeRate.split("\\.")[1].length() < 4) {
+                                exchangeRate = exchangeRate.concat("0");
+
+                            }
                         }
                         String line = dateElement.getAttribute("value") + "," + exchangeRate;
                         dataList.add(line);
@@ -128,7 +132,7 @@ class CurrencyRateFetcher {
                     int count = -1;
                     while (entry.split(",")[1].equals("NaN")) {
                         try {
-                            entry = entry.split(" ")[0] + "," + dataList.get(i+count).split(" ")[1];
+                            entry = entry.split(",")[0] + "," + dataList.get(i+count).split(",")[1];
                             dataList.set(i, entry);
                         } catch (IndexOutOfBoundsException e) {
                             count = dataList.size()-i;
