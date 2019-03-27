@@ -110,14 +110,14 @@ class StockInfoFetcher {
         Map<String, String> map = new TreeMap<>(data);
         Set<Map.Entry<String, String>> set2 = map.entrySet();
         Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();
+        List<String> writeList = new ArrayList<>();
         try {
-            boolean append = false;
             while (iterator2.hasNext()) {
                 Map.Entry<String, String> me2 = iterator2.next();
                 String writeLine = me2.getKey()+ "," + me2.getValue();
-                FileManager.writeLine(filename, writeLine, append);
-                append = true;
+                writeList.add(writeLine);
             }
+            FileManager.writeList(filename, writeList);
         } catch (Exception e)
         {
             e.printStackTrace();

@@ -35,20 +35,12 @@ public class FileManager {
     }
 
     public static void writeList(String dest, List<String> writeList) {
-        boolean append = false;
-
-        for (String writeLine: writeList) {
-            writeLine(dest, writeLine, append);
-            append = true;
-        }
-    }
-
-    public static void writeArray(String dest, Object[] writeArray) {
-        boolean append = false;
-        for (Object writeObject: writeArray) {
-            String writeLine = writeObject.toString();
-            writeLine(dest, writeLine, append);
-            append = true;
+        try(Writer writer = new BufferedWriter(new FileWriter(dest))) {
+            for (String writeLine: writeList) {
+                writer.write(writeLine + "\n");
+            }
+        } catch (Exception e ) {
+            e.printStackTrace();
         }
     }
 
@@ -68,6 +60,14 @@ public class FileManager {
     public static boolean fileExists(String dest) {
         File file = new File(dest);
         return file.isFile();
+    }
+
+    public static void copyFile(String source, String out) {
+        try {
+            Files.copy(Paths.get(source), Paths.get(out));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void deleteTempFiles(String dest)

@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -123,12 +125,7 @@ public class StockTracker {
      * as to not call the APIs too much and improve performance.
      */
     public static void createSave() {
-        List<String> dataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
-        boolean append = false;
-        for (int i = 0; i < dataList.size(); i++) {
-            FileManager.writeLine(PATH + "save_data.csv", dataList.get(i), append);
-            append = true;
-        }
+        FileManager.copyFile(PATH + "aggregated_with_money_temp.csv", PATH + "save_data.csv");
     }
 
     /**
