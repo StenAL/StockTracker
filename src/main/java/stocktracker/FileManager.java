@@ -64,7 +64,7 @@ public class FileManager {
 
     public static void copyFile(String source, String out) {
         try {
-            Files.copy(Paths.get(source), Paths.get(out));
+            Files.copy(Paths.get(source), Paths.get(out), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }

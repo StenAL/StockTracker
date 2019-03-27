@@ -124,6 +124,7 @@ public class StockTracker {
      */
     public static void createSave() {
         FileManager.copyFile(PATH + "aggregated_with_money_temp.csv", PATH + "save_data.csv");
+        FileManager.copyFile(PATH + "dividends_aggregated_temp.csv", PATH + "save_dividends.csv");
     }
 
     /**
@@ -150,11 +151,16 @@ public class StockTracker {
                 updateData(line.split(",")[0], lastDate.plusDays(1), Double.parseDouble(line.split(",")[2]));
             }
             calculateMoney(tickers, stockAmounts);
-            List<String> newDataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
 
+            List<String> newDataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
             for (String s : newDataList) {
                 FileManager.writeLine(PATH + "save_data.csv", s, true);
             }
+            List<String> newDividendList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
+            for (String s : newDividendList) {
+                FileManager.writeLine(PATH + "save_dividends.csv", s, true);
+            }
+
             return true;
         }
         else {
