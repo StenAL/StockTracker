@@ -29,7 +29,7 @@ class CurrencyRateFetcher {
     }
 
     public static void main(String[] args) throws IOException  {
-        writeCurrencyInfo("USD", LocalDate.of(2008, 03, 02));
+        writeCurrencyInfo("USD", LocalDate.of(2008, 3, 2));
         //writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
         //writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
     }

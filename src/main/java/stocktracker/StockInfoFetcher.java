@@ -10,6 +10,7 @@ import org.patriques.output.timeseries.data.StockData;
 import java.time.LocalDate;
 import java.util.*;
 
+//TODO: add unit tests for dividend fetching
 class StockInfoFetcher {
 
     private static final String API_KEY = "NZ04YC2MOTE5AN4P";
@@ -106,22 +107,13 @@ class StockInfoFetcher {
     }
 
     private static void writeData(Map<String, String> data, String ticker) {
-        String filename = StockTracker.PATH + ticker + "_temp.csv";
-        Map<String, String> map = new TreeMap<>(data);
-        Set<Map.Entry<String, String>> set2 = map.entrySet();
-        Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();
         List<String> writeList = new ArrayList<>();
-        try {
-            while (iterator2.hasNext()) {
-                Map.Entry<String, String> me2 = iterator2.next();
-                String writeLine = me2.getKey()+ "," + me2.getValue();
-                writeList.add(writeLine);
-            }
-            FileManager.writeList(filename, writeList);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
+        Object[] keyArray = data.keySet().toArray();
+        Arrays.sort(keyArray);
+        for (Object key: keyArray) {
+            writeList.add(key + "," + data.get((String) key));
         }
+        FileManager.writeList(StockTracker.PATH + ticker + "_temp.csv", writeList);
     }
 
     static LocalDate getMostRecentDay() {

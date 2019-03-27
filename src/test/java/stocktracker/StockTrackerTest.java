@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ class StockTrackerTest {
     private static final String PATH = StockTracker.PATH;
 
     @BeforeAll
-    static void setup() throws IOException {
+    static void setup() {
         testList = new ArrayList<>();
         testList.add("IVV");
         testList.add("QQQ");

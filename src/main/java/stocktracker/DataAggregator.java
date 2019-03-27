@@ -1,12 +1,11 @@
 package stocktracker;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
-//TODO: add unit tests for aggregate()
+//TODO: add unit tests for aggregateStock()
+//TODO: add unit tests for dividend aggregation
 class DataAggregator {
     public static void main(String[] args) throws IOException {
         test();
@@ -14,8 +13,8 @@ class DataAggregator {
 
     private static void test() throws IOException {
         ArrayList<String> testList = new ArrayList<>();
-        testList.add("QQQ_USD");
-        testList.add("IVV_USD");
+        testList.add("QQQ");
+        testList.add("IVV");
         ArrayList<Number> testAmounts = new ArrayList<>();
         testAmounts.add(5);
         testAmounts.add(10);
@@ -23,7 +22,7 @@ class DataAggregator {
     }
 
     static void calculateMoney(List<String> tickers, List<Number> stockAmounts) throws IOException {
-        aggregate(tickers);
+        aggregateStocks(tickers);
         List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.csv");
         List<String> dateMoney = new ArrayList<>();
         for (String line: finalData) {
@@ -46,9 +45,10 @@ class DataAggregator {
         FileManager.writeList(StockTracker.PATH + "aggregated_with_money_temp.csv", dateMoney);
     }
 
-    private static void aggregate(List<String> tickers) throws IOException {
+    private static void aggregateStocks(List<String> tickers) {
         List<String> data;
         try {
+            aggregateDividends(tickers);
             data = FileManager.readLines(StockTracker.PATH + tickers.get(0) + "_currency_temp.csv");
             for (int i = 1; i < tickers.size(); i++) {
                 List<String> fileLines = FileManager.readLines(StockTracker.PATH + tickers.get(i) + "_currency_temp.csv");
@@ -70,7 +70,7 @@ class DataAggregator {
      * on dates with no values. If the first day of the whole file happens to be a market
      * holiday then we use the next available day's close value instead.
      */
-    static void aggregate(String ticker, String currency) throws IOException {
+    static void aggregateStock(String ticker, String currency) throws IOException {
         String workingDir = StockTracker.PATH;
         List<String> stockDates = new ArrayList<>();
         List<String> currencyDates = new ArrayList<>();
@@ -125,7 +125,30 @@ class DataAggregator {
             writeList.add(aggregateDates.get(i) + "," + stockRates.get(i) + "," + currencyRates.get(i));
         }
         FileManager.writeList(dest, writeList);
+    }
 
+    private static void aggregateDividends(List<String> tickers) {
+        Map<String, String> data = new HashMap<>();
+        for (String ticker : tickers) {
+            List<String> fileLines = FileManager.readLines(StockTracker.PATH + ticker + "_dividend_temp.csv");
+            for (String fileLine : fileLines) {
+                String date = fileLine.split(",")[0];
+                String dividend = fileLine.split(",")[1];
+                if (!data.containsKey(date)) {
+                    data.put(date, ticker + "," + dividend);
+                } else {
+                    data.put(date, data.get(date) + "," + ticker + "," + dividend);
+
+                }
+            }
+        }
+        List<String> writeList = new ArrayList<>();
+        Object[] keyArray = data.keySet().toArray();
+        Arrays.sort(keyArray);
+        for (Object key: keyArray) {
+            writeList.add(key + "," + data.get(key));
+        }
+        FileManager.writeList(StockTracker.PATH + "dividends_aggregated_temp.csv", writeList);
     }
 
     private static void fillMissingDates(List<String> datesList, List<String> ratesList, String date) {

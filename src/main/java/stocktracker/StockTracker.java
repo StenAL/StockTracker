@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -86,7 +84,7 @@ public class StockTracker {
             StockInfoFetcher.getData(ticker, startDate);
             String currencyCode = YahooFinance.get(ticker).getCurrency();
             CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
-            DataAggregator.aggregate(ticker, currencyCode);
+            DataAggregator.aggregateStock(ticker, currencyCode);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
         } catch (IOException e) {
@@ -99,7 +97,7 @@ public class StockTracker {
             StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
             String currencyCode = YahooFinance.get(ticker).getCurrency();
             CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
-            DataAggregator.aggregate(ticker, currencyCode);
+            DataAggregator.aggregateStock(ticker, currencyCode);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
         } catch (IOException e) {
@@ -154,8 +152,8 @@ public class StockTracker {
             calculateMoney(tickers, stockAmounts);
             List<String> newDataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
 
-            for (int i = 0; i < newDataList.size(); i++) {
-                FileManager.writeLine(PATH + "save_data.csv", newDataList.get(i), true);
+            for (String s : newDataList) {
+                FileManager.writeLine(PATH + "save_data.csv", s, true);
             }
             return true;
         }
