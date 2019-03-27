@@ -20,9 +20,9 @@ class StockInfoFetcher {
     }
 
     private static void test() {
-        getData("AAPL", LocalDate.now().minusDays(35));
+        //getData("AAPL", LocalDate.now().minusDays(35));
         getData("IVV", LocalDate.now().minusDays(365));
-        getData("QQQ", LocalDate.now().minusDays(365));
+        //getData("QQQ", LocalDate.now().minusDays(365));
     }
 
     static void getData(String ticker, LocalDate startDate, double splitCoefficient) {
@@ -60,6 +60,7 @@ class StockInfoFetcher {
         //Map<String, String> metaData = response.getMetaData();
         //generated = metaData.get("3. Last Refreshed");
         List<StockData> stockData = response.getStockData();
+        List<String> dividendData = new ArrayList<>();
         boolean start = true;
         Collections.reverse(stockData);
         for (StockData stock: stockData) {
@@ -74,16 +75,19 @@ class StockInfoFetcher {
                 }
 
                 // Padding with trailing zeroes:
-                String actualPrice = "" + Math.round(stock.getClose()*splitCoefficient*100)/100.0;
-                while (actualPrice.split("\\.")[1].length() < 2) {
-                    actualPrice = actualPrice.concat("0");
+                String dayData = "" + Math.round(stock.getClose()*splitCoefficient*100)/100.0;
+                while (dayData.split("\\.")[1].length() < 2) {
+                    dayData = dayData.concat("0");
+                }
+                if (stock.getDividendAmount() != 0) {
+                    dividendData.add(entryDate + "," + stock.getDividendAmount());
                 }
 
-                dateCloses.put("" + entryDate, "" + actualPrice);
+                dateCloses.put("" + entryDate, dayData);
             }
         }
-
-        // needed for first time startup when no config file exists yet
+        FileManager.writeList(StockTracker.PATH + ticker + "_dividend_temp.csv", dividendData);
+        // try block needed for first time startup when no config file exists yet
         try {
             List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.csv");
             List<String> newConfig = new ArrayList<>();

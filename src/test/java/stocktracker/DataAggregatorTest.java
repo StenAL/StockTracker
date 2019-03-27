@@ -24,8 +24,8 @@ class DataAggregatorTest {
         StockInfoFetcher.getData("AAPL", LocalDate.now().minusDays(139));
         StockInfoFetcher.getData("MSFT", LocalDate.now().minusDays(139));
         CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(139));
-        DataAggregator.aggregate("AAPL_USD");
-        DataAggregator.aggregate("MSFT_USD");
+        DataAggregator.aggregate("AAPL", "USD");
+        DataAggregator.aggregate("MSFT", "USD");
 
         ArrayList<String> testList = new ArrayList<>();
         testList.add("AAPL");
@@ -39,7 +39,7 @@ class DataAggregatorTest {
 
     @Test
     void testInvalidData() {
-        assertThrows(InvalidPathException.class, () -> DataAggregator.aggregate("AAAPL_USD"));
+        assertThrows(InvalidPathException.class, () -> DataAggregator.aggregate("AAAPL", "USD"));
     }
 
     @Test

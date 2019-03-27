@@ -1,6 +1,7 @@
 package stocktracker;
 
 import javafx.application.Application;
+import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -39,6 +40,7 @@ public class StockTrackerGUI extends Application {
     private void createScene(Region root) {
         Scene scene = new Scene(root, width, height);
         new JMetro(JMetro.Style.LIGHT).applyTheme(scene);
+        root.getStylesheets().add("style.css");
         root.requestFocus();
         primaryStage.setScene(scene);
     }
@@ -70,7 +72,8 @@ public class StockTrackerGUI extends Application {
         BorderPane mainPane = new BorderPane();
 
         Label topLabel = new Label("StockTracker");
-        topLabel.setStyle("-fx-font-size: 4em; -fx-text-fill: ivory; -fx-font-family: 'Alegreya Sans SC Medium';");
+        topLabel.setStyle("-fx-font-size: 4.5em; -fx-text-fill: ivory; -fx-font-family: 'Alegreya Sans SC Medium';");
+
         VBox topNode = new VBox(topLabel);
         mainPane.setTop(topNode);
         topNode.setAlignment(Pos.CENTER);
@@ -97,9 +100,12 @@ public class StockTrackerGUI extends Application {
 
     private void setupMenuBar(Pane parent) {
         MenuBar menuBar = new MenuBar();
+
         parent.getChildren().add(menuBar);
 
         Menu fileMenu = new Menu("File");
+
+        fileMenu.setStyle(null);
         MenuItem newItem = new MenuItem("New");
         newItem.setOnAction(event -> setupStartScene());
         MenuItem quitItem = new MenuItem("Quit");
@@ -214,7 +220,7 @@ public class StockTrackerGUI extends Application {
         xAxis.setTickMarkVisible(false);
         yAxis.setLabel("Ca$h (€)");
         LineChart<String,Number> lineChart = new LineChart<>(xAxis,yAxis);
-        lineChart.getStylesheets().add("chart-style.css");
+        lineChart.getStylesheets().add("style.css");
 
         lineChart.setTitle("€€€");
         XYChart.Series<String, Number> series = new XYChart.Series<>();
