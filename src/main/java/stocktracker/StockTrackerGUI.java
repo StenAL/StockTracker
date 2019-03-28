@@ -6,10 +6,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
@@ -20,7 +22,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 //TODO: Add progress bars/loading indication
-//TODO: Add listener for pressing enter in "new tracker" scene as shortcut to go button
+//TODO: Add error displaying when input fields are empty
 
 public class StockTrackerGUI extends Application {
     private Stage primaryStage;
@@ -175,19 +177,55 @@ public class StockTrackerGUI extends Application {
         ExtendableTextField tickerCurrencyTextField = new ExtendableTextField(inputDataBox);
         tickerCurrencyTextField.setMaxWidth(200);
         tickerCurrencyTextField.setPromptText("ticker");
-
+        tickerCurrencyTextField.amountField.setOnKeyPressed(e -> {
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                plotNewData(startDate.getValue());
+            }
+        });
 
         inputDataBox.setAlignment(Pos.CENTER);
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.RED);
+        errorLabel.setTextAlignment(TextAlignment.LEFT);
+        errorLabel.setPrefWidth(270);
 
         Button goButton = new Button("Go!");
-        goButton.setOnAction(e -> plotNewData(startDate.getValue()));
+        goButton.setOnAction(e -> {
+            if (checkValidInput() && startDate.getValue() != null) {
+                plotNewData(startDate.getValue());
+            }
+            else {
+                errorLabel.setText("");
+                if (!checkValidInput()) {
+                    errorLabel.setText("Input a stock ticker and a corresponding amount\n");
+                }
+                if (startDate.getValue() == null) {
+                    errorLabel.setText(errorLabel.getText() + "Pick a date");
+                }
 
-        VBox contentPane = new VBox(startDateBox, inputDataBox, goButton);
+                }
+        });
+
+        VBox contentPane = new VBox(startDateBox, inputDataBox, errorLabel, goButton);
         contentPane.setSpacing(30);
         contentPane.setAlignment(Pos.CENTER);
         root.getChildren().add(contentPane);
 
         createScene(root);
+    }
+
+    private boolean checkValidInput() {
+        boolean valid = true;
+        for (ExtendableTextField field: stocksTracked) {
+            if (field.getText().equals("") && !field.amountField.getText().equals("") ||
+                    !field.getText().equals("") && field.amountField.getText().equals("")) {
+                valid = false;
+            }
+        }
+        if (stocksTracked.get(0).getText().equals("") || stocksTracked.get(0).amountField.getText().equals("")) {
+            valid = false;
+        }
+        return valid;
     }
 
     private void plotNewData(LocalDate startDate) {

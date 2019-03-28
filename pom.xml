@@ -18,7 +18,7 @@
     </repository>
     <repository>
         <id>0002</id>
-        <name>mulesoft (for xmlparser</name>
+        <name>mulesoft (for xmlparser)</name>
         <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
     </repository>
     </repositories>
