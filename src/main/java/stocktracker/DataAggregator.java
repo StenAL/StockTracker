@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.*;
 
 
-//TODO: add unit tests for aggregateStock()
-//TODO: add unit tests for dividend aggregation
 class DataAggregator {
     public static void main(String[] args) throws IOException {
         test();

@@ -14,9 +14,9 @@ class StockInfoFetcherTest {
     private static List<String> dataList;
     @BeforeAll
     static synchronized void updateData() {
-        StockInfoFetcher.getData("TSLA", LocalDate.now().minusDays(139));
+        StockInfoFetcher.getData("BRK-B", LocalDate.now().minusDays(139));
         PATH = StockTracker.PATH;
-        dataList = FileManager.readLines(PATH + "TSLA_temp.csv");
+        dataList = FileManager.readLines(PATH + "BRK-B_temp.csv");
     }
 
     @Nested
@@ -45,7 +45,7 @@ class StockInfoFetcherTest {
 
         @Test
         void testFetchingNewData() {
-            File dataFile = new File(PATH + "TSLA_temp.csv");
+            File dataFile = new File(PATH + "BRK-B_temp.csv");
             assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
         }
 
@@ -56,6 +56,16 @@ class StockInfoFetcherTest {
                 String[] config = FileManager.readLines(PATH + "save_config.csv").get(0).split(",");
                 assertDoesNotThrow(() -> Integer.parseInt(config[1]));
                 assertDoesNotThrow(() -> Double.parseDouble(config[2]));
+            }
+        }
+
+        @Test
+        void testDividends() {
+            List<String> dividendDataList = FileManager.readLines(PATH + "BRK-B_dividend_temp.csv");
+            if (dividendDataList.size() > 0) {
+                String[] dividendLine = dividendDataList.get(0).split(",");
+                assertDoesNotThrow(() -> LocalDate.parse(dividendLine[0]));
+                assertDoesNotThrow(() -> Double.parseDouble(dividendLine[1]));
             }
         }
     }
@@ -70,6 +80,6 @@ class StockInfoFetcherTest {
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        Thread.sleep(15000);
+        Thread.sleep(60000);
     }
 }

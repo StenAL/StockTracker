@@ -10,7 +10,6 @@ import org.patriques.output.timeseries.data.StockData;
 import java.time.LocalDate;
 import java.util.*;
 
-//TODO: add unit tests for dividend fetching
 class StockInfoFetcher {
 
     private static final String API_KEY = "NZ04YC2MOTE5AN4P";
@@ -22,7 +21,7 @@ class StockInfoFetcher {
 
     private static void test() {
         //getData("AAPL", LocalDate.now().minusDays(35));
-        getData("IVV", LocalDate.now().minusDays(365));
+        getData("BRK-B", LocalDate.now().minusDays(365));
         //getData("QQQ", LocalDate.now().minusDays(365));
     }
 

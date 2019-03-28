@@ -25,8 +25,7 @@ public class FileManager {
     }
 
     public static void writeLine(String dest, String writeLine, boolean append) {
-        try {
-            Writer writer = new BufferedWriter(new FileWriter(dest, append));
+        try (Writer writer = new BufferedWriter(new FileWriter(dest, append))){
             writer.write(writeLine + "\n");
             writer.flush();
         } catch (Exception e) {
@@ -35,7 +34,7 @@ public class FileManager {
     }
 
     public static void writeList(String dest, List<String> writeList) {
-        try(Writer writer = new BufferedWriter(new FileWriter(dest))) {
+        try (Writer writer = new BufferedWriter(new FileWriter(dest))) {
             for (String writeLine: writeList) {
                 writer.write(writeLine + "\n");
             }
@@ -47,8 +46,7 @@ public class FileManager {
     public static List<String> readLines(String dest) {
         ArrayList<String> lines = new ArrayList<>();
         try {
-            Files.lines(Paths.get(dest))
-                    .forEach(lines::add);
+            Files.lines(Paths.get(dest)).forEach(lines::add);
         } catch (NoSuchFileException e) {
             throw new InvalidPathException("", "No file exists at " + dest);
         } catch (IOException e) {
