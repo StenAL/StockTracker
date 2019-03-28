@@ -14,6 +14,7 @@ import java.util.List;
 
 //TODO: Add more/better jUnit testing
 //TODO: Account for dividends using AlphaVantage + add boolean for reinvesting dividends
+//TODO: Add enum for constants
 public class StockTracker {
 
     public static final String VERSION = "1.3.0";
@@ -83,7 +84,7 @@ public class StockTracker {
             StockInfoFetcher.getData(ticker, startDate);
             String currencyCode = YahooFinance.get(ticker).getCurrency();
             CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
-            DataAggregator.aggregate(ticker + "_" + currencyCode);
+            DataAggregator.aggregateStock(ticker, currencyCode);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
         } catch (IOException e) {
@@ -96,7 +97,7 @@ public class StockTracker {
             StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
             String currencyCode = YahooFinance.get(ticker).getCurrency();
             CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
-            DataAggregator.aggregate(ticker + "_" + currencyCode);
+            DataAggregator.aggregateStock(ticker, currencyCode);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
         } catch (IOException e) {
@@ -110,11 +111,7 @@ public class StockTracker {
      * @param stockAmounts List of amounts of stocks owned.
      */
     public static void calculateMoney(List<String> tickers, List<Number> stockAmounts) {
-        try {
-            DataAggregator.calculateMoney(tickers, stockAmounts);
-        } catch (IOException e) {
-            System.out.println("Something went horrendously wrong");
-        }
+        DataAggregator.calculateMoney(tickers, stockAmounts);
     }
 
     /**
@@ -122,12 +119,8 @@ public class StockTracker {
      * as to not call the APIs too much and improve performance.
      */
     public static void createSave() {
-        List<String> dataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
-        boolean append = false;
-        for (int i = 0; i < dataList.size(); i++) {
-            FileManager.writeLine(PATH + "save_data.csv", dataList.get(i), append);
-            append = true;
-        }
+        FileManager.copyFile(PATH + "aggregated_with_money_temp.csv", PATH + "save_data.csv");
+        FileManager.copyFile(PATH + "dividends_aggregated_temp.csv", PATH + "save_dividends.csv");
     }
 
     /**
@@ -154,11 +147,16 @@ public class StockTracker {
                 updateData(line.split(",")[0], lastDate.plusDays(1), Double.parseDouble(line.split(",")[2]));
             }
             calculateMoney(tickers, stockAmounts);
-            List<String> newDataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
 
-            for (int i = 0; i < newDataList.size(); i++) {
-                FileManager.writeLine(PATH + "save_data.csv", newDataList.get(i), true);
+            List<String> newDataList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
+            for (String s : newDataList) {
+                FileManager.writeLine(PATH + "save_data.csv", s, true);
             }
+            List<String> newDividendList = FileManager.readLines(PATH + "aggregated_with_money_temp.csv");
+            for (String s : newDividendList) {
+                FileManager.writeLine(PATH + "save_dividends.csv", s, true);
+            }
+
             return true;
         }
         else {

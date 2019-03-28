@@ -63,6 +63,6 @@ class CurrencyRateFetcherTest {
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        Thread.sleep(15000);
+        Thread.sleep(20000);
     }
 }

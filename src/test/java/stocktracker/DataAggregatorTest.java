@@ -1,8 +1,6 @@
 package stocktracker;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,14 +16,15 @@ class DataAggregatorTest {
 
     private static final String PATH = StockTracker.PATH;
     private static List<String> dataList;
+    private static List<String> dividendDataList;
 
     @BeforeAll
     static void updateData() throws IOException {
         StockInfoFetcher.getData("AAPL", LocalDate.now().minusDays(139));
         StockInfoFetcher.getData("MSFT", LocalDate.now().minusDays(139));
         CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(139));
-        DataAggregator.aggregate("AAPL_USD");
-        DataAggregator.aggregate("MSFT_USD");
+        DataAggregator.aggregateStock("AAPL", "USD");
+        DataAggregator.aggregateStock("MSFT", "USD");
 
         ArrayList<String> testList = new ArrayList<>();
         testList.add("AAPL");
@@ -39,41 +38,56 @@ class DataAggregatorTest {
 
     @Test
     void testInvalidData() {
-        assertThrows(InvalidPathException.class, () -> DataAggregator.aggregate("AAAPL_USD"));
+        assertThrows(InvalidPathException.class, () -> DataAggregator.aggregateStock("AAAPL", "USD"));
     }
 
     @Test
     void testSingleAggregation() {
         File dataFile = new File(PATH + "AAPL_currency_temp.csv");
-        assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
+        assertTrue(dataFile.lastModified() > System.currentTimeMillis() - 120000);
         List<String> data = FileManager.readLines(PATH + "AAPL_currency_temp.csv");
-        String line = data.get(new Random().nextInt(data.size()-1));
+        String line = data.get(new Random().nextInt(data.size() - 1));
+        assertTrue(data.size() > 80);
         assertEquals(3, line.split(",").length);
         assertDoesNotThrow(() -> LocalDate.parse(line.split(",")[0]));
     }
-
-    @Test
-    void testDataValidity() {
-        for (String entry : dataList) {
-            String[] splitEntry = entry.split(",");
-            assertEquals(splitEntry.length, 5);
-            assertDoesNotThrow(() -> LocalDate.parse(splitEntry[0]));
+    @Nested
+    @DisplayName("compoundAggregation")
+    class compoundAggregate {
+        @Test
+        void testDataValidity() {
+            for (String entry : dataList) {
+                String[] splitEntry = entry.split(",");
+                assertEquals(splitEntry.length, 5);
+                assertDoesNotThrow(() -> LocalDate.parse(splitEntry[0]));
+            }
         }
-    }
 
-    @Test
-    void testDataSize() {
-        assertTrue(dataList.size() > 80);
-    }
+        @Test
+        void testDataSize() {
+            assertTrue(dataList.size() > 80);
+        }
 
-    @Test
-    void testFetchingNewData() {
-        File dataFile = new File(PATH + "aggregated_temp.csv");
-        assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
+        @Test
+        void testFetchingNewData() {
+            File dataFile = new File(PATH + "aggregated_temp.csv");
+            assertTrue(dataFile.lastModified() > System.currentTimeMillis() - 120000);
+        }
+
+        @Test
+        void testDividendAggregation() {
+            List<String> dividendDataList = FileManager.readLines(PATH + "dividends_aggregated_temp.csv");
+            if (dividendDataList.size() > 0) {
+                String[] dividendLine = dividendDataList.get(0).split(",");
+                assertTrue(dividendLine.length >= 3);
+                assertDoesNotThrow(() -> LocalDate.parse(dividendLine[0]));
+                assertDoesNotThrow(() -> Double.parseDouble(dividendLine[2]));
+            }
+        }
     }
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        Thread.sleep(15000);
+        Thread.sleep(60000);
     }
 }

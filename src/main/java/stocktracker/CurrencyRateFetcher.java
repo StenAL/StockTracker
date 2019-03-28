@@ -86,7 +86,7 @@ class CurrencyRateFetcher {
         }
 
         /**
-         * If anything ever breaks, use this:
+         * If anything breaks here, use this:
          * https://www.mkyong.com/java/how-to-read-xml-file-in-java-dom-parser/
          */
         private List<String> parse() {
@@ -116,8 +116,11 @@ class CurrencyRateFetcher {
 
                         // Padding with trailing zeroes:
                         String exchangeRate = exchangeRateElement.getAttribute("value");
-                        while (exchangeRate.split("\\.")[1].length() < 4) {
-                            exchangeRate = exchangeRate.concat("0");
+                        if (!exchangeRate.equals("NaN")) {
+                            while (exchangeRate.split("\\.")[1].length() < 4) {
+                                exchangeRate = exchangeRate.concat("0");
+
+                            }
                         }
                         String line = dateElement.getAttribute("value") + "," + exchangeRate;
                         dataList.add(line);
@@ -128,7 +131,7 @@ class CurrencyRateFetcher {
                     int count = -1;
                     while (entry.split(",")[1].equals("NaN")) {
                         try {
-                            entry = entry.split(" ")[0] + "," + dataList.get(i+count).split(" ")[1];
+                            entry = entry.split(",")[0] + "," + dataList.get(i+count).split(",")[1];
                             dataList.set(i, entry);
                         } catch (IndexOutOfBoundsException e) {
                             count = dataList.size()-i;

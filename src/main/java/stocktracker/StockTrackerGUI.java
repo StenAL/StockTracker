@@ -6,23 +6,24 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.paint.ImagePattern;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro8.JMetro;
-import yahoofinance.YahooFinance;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.*;
 
 //TODO: Add progress bars/loading indication
+//TODO: Add listener for pressing enter in "new tracker" scene as shortcut to go button
 
 public class StockTrackerGUI extends Application {
     private Stage primaryStage;
-    private Label statusLabel;
     private int width;
     private int height;
     private ArrayList<ExtendableTextField> stocksTracked;
@@ -40,6 +41,7 @@ public class StockTrackerGUI extends Application {
     private void createScene(Region root) {
         Scene scene = new Scene(root, width, height);
         new JMetro(JMetro.Style.LIGHT).applyTheme(scene);
+        root.getStylesheets().add("style.css");
         root.requestFocus();
         primaryStage.setScene(scene);
     }
@@ -49,28 +51,30 @@ public class StockTrackerGUI extends Application {
         stocksTracked = new ArrayList<>();
         primaryStage.setTitle("StockTracker");
         primaryStage.getIcons().add(new Image("icon.png"));
-        statusLabel = new Label("");
         width = (int) Screen.getPrimary().getBounds().getWidth()/2;
         height = (int) Screen.getPrimary().getBounds().getHeight()/2;
 
         Button newButton = new Button("New tracker");
         newButton.setPrefSize(150, 20);
         newButton.setOnAction(event -> setupNewTrackerScene());
+        new JMetro(JMetro.Style.DARK).applyTheme(newButton);
 
         Button existingButton = new Button("Existing tracker");
         existingButton.setPrefSize(150, 20);
         existingButton.setDisable(!new File(StockTracker.PATH + "save_config.csv").exists());
         existingButton.setOnAction(event -> {
             updateExistingData();
-            makeGraphScene(false);
+            makeGraphScene();
         });
+        new JMetro(JMetro.Style.DARK).applyTheme(existingButton);
 
         VBox root = new VBox();
 
         BorderPane mainPane = new BorderPane();
 
         Label topLabel = new Label("StockTracker");
-        topLabel.setStyle("-fx-font-size: 3em;");
+        topLabel.setStyle("-fx-font-size: 4.5em; -fx-text-fill: ivory; -fx-font-family: 'Alegreya Sans SC Medium';");
+
         VBox topNode = new VBox(topLabel);
         mainPane.setTop(topNode);
         topNode.setAlignment(Pos.CENTER);
@@ -82,22 +86,27 @@ public class StockTrackerGUI extends Application {
         centerNode.setAlignment(Pos.CENTER);
         mainPane.setCenter(centerNode);
 
-        setStatusLabel("Ready...");
-
         setupMenuBar(root);
 
         Region region = new Region();
-        root.getChildren().addAll(mainPane, region, statusLabel);
+        root.getChildren().addAll(mainPane, region);
         VBox.setVgrow(region, Priority.ALWAYS);
+
+        Image image = new Image("background.jpg");
+        BackgroundFill backgroundFill = new BackgroundFill(new ImagePattern(image), CornerRadii.EMPTY, Insets.EMPTY);
+        root.setBackground(new Background(backgroundFill));
 
         createScene(root);
     }
 
     private void setupMenuBar(Pane parent) {
         MenuBar menuBar = new MenuBar();
+
         parent.getChildren().add(menuBar);
 
         Menu fileMenu = new Menu("File");
+
+        fileMenu.setStyle(null);
         MenuItem newItem = new MenuItem("New");
         newItem.setOnAction(event -> setupStartScene());
         MenuItem quitItem = new MenuItem("Quit");
@@ -128,7 +137,7 @@ public class StockTrackerGUI extends Application {
             alert.setTitle("How to use StockTracker");
             alert.setContentText("1. Press 'New Tracker'\n2. Choose the date you wish to start" +
                     " tracking the stocks from\n3. Write down the stock you wish to track " +
-                    "(e.g. AAPL_USD) in the ticker field. Write how much of that stock" +
+                    "(e.g. AAPL) in the ticker field. Write how much of that stock " +
                     "you own in the amount field.\n4. Press 'Go!'");
             new JMetro(JMetro.Style.LIGHT).applyTheme(stage.getScene());
             alert.showAndWait();});
@@ -199,10 +208,10 @@ public class StockTrackerGUI extends Application {
         createConfig(dataList, amounts);
         calculateMoney(dataList, amounts);
         createSave();
-        makeGraphScene(true);
+        makeGraphScene();
     }
 
-    private void makeGraphScene(boolean newData) {
+    private void makeGraphScene() {
         VBox root = new VBox();
         setupMenuBar(root);
 
@@ -210,28 +219,37 @@ public class StockTrackerGUI extends Application {
         NumberAxis yAxis = new NumberAxis();
         xAxis.setLabel("Date");
         xAxis.setTickMarkVisible(false);
-        yAxis.setLabel("Ca$h (€)");
+        yAxis.setLabel("Money (€)");
         LineChart<String,Number> lineChart = new LineChart<>(xAxis,yAxis);
-        lineChart.getStylesheets().add("chart-style.css");
+        lineChart.getStylesheets().add("style.css");
 
-        lineChart.setTitle("€€€");
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        //series.setName("My portfolio");
         double money = 0;
-        String moneyFile;
-        if (newData) {
-            moneyFile = StockTracker.PATH + "aggregated_with_money_temp.csv";
-        }
-        else {
-            moneyFile = StockTracker.PATH + "save_data.csv";
+
+        Map<String, String> dividendData = new HashMap<>();
+        for (String dividendEntry: FileManager.readLines(StockTracker.PATH + "save_dividends.csv")) {
+            String[] splitEntry = dividendEntry.split(",", 2);
+            String dividendInformation = "";
+            String[] split = splitEntry[1].split(",");
+            for (int i = 0; i < split.length; i++) {
+                String data = split[i];
+                dividendInformation = dividendInformation.concat(" " + data);
+                if (i % 3 == 0) {
+                    dividendInformation += "\n";
+                }
+            }
+            dividendData.put(splitEntry[0], splitEntry[1].replace(",", " "));
         }
 
-        for (String line: FileManager.readLines(moneyFile)) {
+        for (String line: FileManager.readLines(StockTracker.PATH + "save_data.csv")) {
             String[] splitLine = line.split(",");
             money = Double.parseDouble(splitLine[splitLine.length-1]);
             String date = splitLine[0];
             XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(date, money);
             dataPoint.setNode(new HoveredThresholdNode(date, money));
+            if (dividendData.keySet().contains(date)) {
+                dataPoint.setNode(new DividendNode(date, money, "Dividends: " + dividendData.get(date)));
+            }
             series.getData().add(dataPoint);
         }
         lineChart.setCreateSymbols(false);
@@ -249,9 +267,8 @@ public class StockTrackerGUI extends Application {
         hBox.setAlignment(Pos.CENTER);
 
         Region region = new Region();
-        root.getChildren().addAll(lineChart, hBox, region, statusLabel);
+        root.getChildren().addAll(lineChart, hBox, region);
         VBox.setVgrow(region, Priority.ALWAYS);
-        setStatusLabel("Done...");
 
         createScene(root);
     }
@@ -259,10 +276,6 @@ public class StockTrackerGUI extends Application {
     @Override
     public void stop(){
         deleteTempFiles();
-    }
-
-    private void setStatusLabel(String newProgress) {
-        statusLabel.setText(newProgress);
     }
 
     private void updateExistingData() {
@@ -274,7 +287,6 @@ public class StockTrackerGUI extends Application {
     }
 
     private void writeData(String ticker, LocalDate startDate) {
-        setStatusLabel("Fetching " + ticker + " data...");
         StockTracker.writeData(ticker, startDate);
     }
 
@@ -283,7 +295,6 @@ public class StockTrackerGUI extends Application {
     }
 
     private void calculateMoney(ArrayList<String> ticker_currency, ArrayList<Number> stockAmounts) {
-        setStatusLabel("Aggregating data..." );
         StockTracker.calculateMoney(ticker_currency, stockAmounts);
     }
 
@@ -302,6 +313,18 @@ public class StockTrackerGUI extends Application {
             setBackground(Background.EMPTY);
             Tooltip tooltip = new Tooltip(date + ": " + value);
             Tooltip.install(this, tooltip);
+        }
+    }
+
+    private class DividendNode extends StackPane {
+        private DividendNode(String date, Number value, String dividendInfo) {
+            setPrefSize(15, 15);
+            setBackground(new Background(new BackgroundFill(Color.DARKOLIVEGREEN, new CornerRadii(12), null)));
+            Tooltip tooltip = new Tooltip(date + ": " + value + " EUR\n" + dividendInfo);
+            Tooltip.install(this, tooltip);
+            Label dollarSign = new Label("$");
+            dollarSign.setStyle("-fx-text-fill: white");
+            this.getChildren().add(dollarSign);
         }
     }
 

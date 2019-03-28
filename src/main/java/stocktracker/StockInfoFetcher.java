@@ -60,6 +60,7 @@ class StockInfoFetcher {
         //Map<String, String> metaData = response.getMetaData();
         //generated = metaData.get("3. Last Refreshed");
         List<StockData> stockData = response.getStockData();
+        List<String> dividendData = new ArrayList<>();
         boolean start = true;
         Collections.reverse(stockData);
         for (StockData stock: stockData) {
@@ -74,16 +75,19 @@ class StockInfoFetcher {
                 }
 
                 // Padding with trailing zeroes:
-                String actualPrice = "" + Math.round(stock.getClose()*splitCoefficient*100)/100.0;
-                while (actualPrice.split("\\.")[1].length() < 2) {
-                    actualPrice = actualPrice.concat("0");
+                String dayData = "" + Math.round(stock.getClose()*splitCoefficient*100)/100.0;
+                while (dayData.split("\\.")[1].length() < 2) {
+                    dayData = dayData.concat("0");
+                }
+                if (stock.getDividendAmount() != 0) {
+                    dividendData.add(entryDate + "," + stock.getDividendAmount());
                 }
 
-                dateCloses.put("" + entryDate, "" + actualPrice);
+                dateCloses.put("" + entryDate, dayData);
             }
         }
-
-        // needed for first time startup when no config file exists yet
+        FileManager.writeList(StockTracker.PATH + ticker + "_dividend_temp.csv", dividendData);
+        // try block needed for first time startup when no config file exists yet
         try {
             List<String> oldConfig = FileManager.readLines(StockTracker.PATH + "save_config.csv");
             List<String> newConfig = new ArrayList<>();
@@ -102,22 +106,13 @@ class StockInfoFetcher {
     }
 
     private static void writeData(Map<String, String> data, String ticker) {
-        String filename = StockTracker.PATH + ticker + "_temp.csv";
-        Map<String, String> map = new TreeMap<>(data);
-        Set<Map.Entry<String, String>> set2 = map.entrySet();
-        Iterator<Map.Entry<String, String>> iterator2 = set2.iterator();
-        try {
-            boolean append = false;
-            while (iterator2.hasNext()) {
-                Map.Entry<String, String> me2 = iterator2.next();
-                String writeLine = me2.getKey()+ "," + me2.getValue();
-                FileManager.writeLine(filename, writeLine, append);
-                append = true;
-            }
-        } catch (Exception e)
-        {
-            e.printStackTrace();
+        List<String> writeList = new ArrayList<>();
+        Object[] keyArray = data.keySet().toArray();
+        Arrays.sort(keyArray);
+        for (Object key: keyArray) {
+            writeList.add(key + "," + data.get((String) key));
         }
+        FileManager.writeList(StockTracker.PATH + ticker + "_temp.csv", writeList);
     }
 
     static LocalDate getMostRecentDay() {
