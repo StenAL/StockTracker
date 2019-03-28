@@ -79,6 +79,7 @@ class DataAggregatorTest {
             List<String> dividendDataList = FileManager.readLines(PATH + "dividends_aggregated_temp.csv");
             if (dividendDataList.size() > 0) {
                 String[] dividendLine = dividendDataList.get(0).split(",");
+                assertTrue(dividendLine.length >= 3);
                 assertDoesNotThrow(() -> LocalDate.parse(dividendLine[0]));
                 assertDoesNotThrow(() -> Double.parseDouble(dividendLine[2]));
             }

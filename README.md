@@ -12,11 +12,12 @@ For functional usage navigate to "Help -> Getting Started" from the menu bar of 
 
 ## Built With
 
-* [Java 8](https://www.oracle.com/technetwork/java/javase/overview/java8-2100321.html) - Programming language used
+* [Java 8](https://www.oracle.com/technetwork/java/javase/overview/java8-2100321.html) - The programming language used
 * [Maven](https://maven.apache.org/) - Dependency Management, project building and deployment
 * [Alpha Vantage API](https://www.alphavantage.co/) - API for fetching stock price data
-* [Quotes API for Yahoo Finance](https://financequotes-api.com/) - API for fetching additional stock data (e.g. currency it's traded in)
-* [ECB SDMX 2.1 RESTful web service](https://sdw-wsrest.ecb.europa.eu/help/) - API for fetching currency exchange rate data
+* [Quotes API for Yahoo Finance] (https://financequotes-api.com/) - API for fetching additional stock data
+* [ECB SDMX 2.1 RESTful web service](https://sdw-wsrest.ecb.europa.eu/help/) - API for fetching currency data
+* [JavaFX](https://openjfx.io/), [JUnit 5](https://junit.org/junit5/)
 
 ## Authors
 

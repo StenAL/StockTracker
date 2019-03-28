@@ -20,9 +20,9 @@ class StockInfoFetcher {
     }
 
     private static void test() {
-        //getData("AAPL", LocalDate.now().minusDays(35));
-        getData("BRK-B", LocalDate.now().minusDays(365));
-        //getData("QQQ", LocalDate.now().minusDays(365));
+        getData("AAPL", LocalDate.now().minusDays(35));
+        getData("IVV", LocalDate.now().minusDays(365));
+        getData("QQQ", LocalDate.now().minusDays(365));
     }
 
     static void getData(String ticker, LocalDate startDate, double splitCoefficient) {

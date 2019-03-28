@@ -1,5 +1,7 @@
 package stocktracker;
 
+import yahoofinance.YahooFinance;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -11,6 +13,8 @@ class DataAggregator {
 
     private static void test() throws IOException {
         ArrayList<String> testList = new ArrayList<>();
+        aggregateStock("QQQ", "USD");
+        aggregateStock("IVV", "USD");
         testList.add("QQQ");
         testList.add("IVV");
         ArrayList<Number> testAmounts = new ArrayList<>();
@@ -19,7 +23,7 @@ class DataAggregator {
         calculateMoney(testList, testAmounts);
     }
 
-    static void calculateMoney(List<String> tickers, List<Number> stockAmounts) throws IOException {
+    static void calculateMoney(List<String> tickers, List<Number> stockAmounts) {
         aggregateStocks(tickers);
         List<String> finalData = FileManager.readLines(StockTracker.PATH + "aggregated_temp.csv");
         List<String> dateMoney = new ArrayList<>();
@@ -125,17 +129,18 @@ class DataAggregator {
         FileManager.writeList(dest, writeList);
     }
 
-    private static void aggregateDividends(List<String> tickers) {
+    private static void aggregateDividends(List<String> tickers) throws IOException {
         Map<String, String> data = new HashMap<>();
         for (String ticker : tickers) {
+            String currencyCode = YahooFinance.get(ticker).getCurrency();
             List<String> fileLines = FileManager.readLines(StockTracker.PATH + ticker + "_dividend_temp.csv");
             for (String fileLine : fileLines) {
                 String date = fileLine.split(",")[0];
                 String dividend = fileLine.split(",")[1];
                 if (!data.containsKey(date)) {
-                    data.put(date, ticker + "," + dividend);
+                    data.put(date, ticker + "," + dividend + "," + currencyCode);
                 } else {
-                    data.put(date, data.get(date) + "," + ticker + "," + dividend);
+                    data.put(date, data.get(date) + "," + ticker + "," + dividend + "," + currencyCode);
 
                 }
             }

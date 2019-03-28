@@ -111,11 +111,7 @@ public class StockTracker {
      * @param stockAmounts List of amounts of stocks owned.
      */
     public static void calculateMoney(List<String> tickers, List<Number> stockAmounts) {
-        try {
-            DataAggregator.calculateMoney(tickers, stockAmounts);
-        } catch (IOException e) {
-            System.out.println("Something went horrendously wrong");
-        }
+        DataAggregator.calculateMoney(tickers, stockAmounts);
     }
 
     /**
