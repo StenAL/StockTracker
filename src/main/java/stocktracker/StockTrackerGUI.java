@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
@@ -177,11 +178,6 @@ public class StockTrackerGUI extends Application {
         ExtendableTextField tickerCurrencyTextField = new ExtendableTextField(inputDataBox);
         tickerCurrencyTextField.setMaxWidth(200);
         tickerCurrencyTextField.setPromptText("ticker");
-        tickerCurrencyTextField.amountField.setOnKeyPressed(e -> {
-            if (e.getCode().equals(KeyCode.ENTER)) {
-                plotNewData(startDate.getValue());
-            }
-        });
 
         inputDataBox.setAlignment(Pos.CENTER);
         Label errorLabel = new Label();
@@ -204,6 +200,11 @@ public class StockTrackerGUI extends Application {
                 }
 
                 }
+        });
+        tickerCurrencyTextField.amountField.setOnKeyPressed(e -> {
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                goButton.fire();
+            }
         });
 
         VBox contentPane = new VBox(startDateBox, inputDataBox, errorLabel, goButton);
@@ -388,10 +389,8 @@ public class StockTrackerGUI extends Application {
         private void setUp() {
             focusedProperty().addListener(e -> {
                 if (nextField == null && stocksTracked.size() < StockTracker.MAX_STOCKS) {
-                    if (previousField == null ) {
-                        makeNextField();
-                    }
-                    else if (previousField.getText().length() > 0) {
+                    // previousField is null for the first instance
+                    if (previousField == null || previousField.getText().length() > 0) {
                         makeNextField();
                     }
                 }
@@ -421,6 +420,13 @@ public class StockTrackerGUI extends Application {
             nextField.setPreviousField(this);
             nextField.setDisable(true);
             nextField.amountField.setDisable(true);
+            // Propagates 'enter' key press upwards to first field
+            nextField.amountField.setOnKeyPressed(e -> {
+                if (e.getCode().equals(KeyCode.ENTER)) {
+                    this.amountField.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ENTER,
+                            true, true, true, true));
+                }
+            });
         }
     }
 }
