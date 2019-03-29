@@ -12,8 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: Add more/better jUnit testing
-//TODO: Add enum for constants
+//TODO: Add enum for constants (version, path, max_stocks)
 public class StockTracker {
 
     public static final String VERSION = "1.4.1";

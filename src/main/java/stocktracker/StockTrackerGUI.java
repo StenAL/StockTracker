@@ -22,7 +22,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 //TODO: Add progress bars/loading indication
-//TODO: Add error displaying when input fields are empty
+//TODO: Add more styling to make GUI look better
 
 public class StockTrackerGUI extends Application {
     private Stage primaryStage;
