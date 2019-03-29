@@ -51,6 +51,7 @@ class DataAggregatorTest {
         assertEquals(3, line.split(",").length);
         assertDoesNotThrow(() -> LocalDate.parse(line.split(",")[0]));
     }
+
     @Nested
     @DisplayName("compoundAggregation")
     class compoundAggregate {
