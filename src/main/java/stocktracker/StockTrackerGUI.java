@@ -308,7 +308,6 @@ public class StockTrackerGUI extends Application {
         Region region = new Region();
         root.getChildren().addAll(lineChart, hBox, region);
         VBox.setVgrow(region, Priority.ALWAYS);
-
         createScene(root);
     }
 

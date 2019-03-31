@@ -78,24 +78,20 @@ public class StockTracker {
      * @param startDate First date the data is written from.
      */
     public static void writeData(String ticker, LocalDate startDate) {
-        try {
-            StockInfoFetcher.getData(ticker, startDate);
-            String currencyCode = YahooFinance.get(ticker).getCurrency();
-            CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
-            DataAggregator.aggregateStock(ticker, currencyCode);
-        } catch (AlphaVantageException e) {
-            System.out.println("Invalid stock ticker '" + ticker + "'");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        updateData(ticker, startDate, 1);
     }
 
     public static void updateData(String ticker, LocalDate startDate, double splitCoefficient) {
         try {
-            StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
+            List<String> stockData = StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
+            FileManager.writeList(StockTracker.PATH + ticker + "_temp.csv", stockData);
+
             String currencyCode = YahooFinance.get(ticker).getCurrency();
-            CurrencyRateFetcher.writeCurrencyInfo(currencyCode, startDate);
-            DataAggregator.aggregateStock(ticker, currencyCode);
+            List<String> currencyData = CurrencyRateFetcher.getCurrencyInfo(currencyCode, startDate);
+            FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.csv", currencyData);
+
+            List<String> aggregatedList =  DataAggregator.aggregateStock(ticker, currencyCode);
+            FileManager.writeList(StockTracker.PATH + ticker + "_currency_temp.csv", aggregatedList);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
         } catch (IOException e) {
@@ -109,7 +105,8 @@ public class StockTracker {
      * @param stockAmounts List of amounts of stocks owned.
      */
     public static void calculateMoney(List<String> tickers, List<Number> stockAmounts) {
-        DataAggregator.calculateMoney(tickers, stockAmounts);
+        List<String> aggregatedDataList = DataAggregator.calculateMoney(tickers, stockAmounts);
+        FileManager.writeList(StockTracker.PATH + "aggregated_with_money_temp.csv", aggregatedDataList);
     }
 
     /**

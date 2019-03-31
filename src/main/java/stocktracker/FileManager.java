@@ -14,7 +14,6 @@ public class FileManager {
     private static void test()
     {
         ArrayList<String> exampleList = new ArrayList<>();
-        FileManager.writeLine("x.txt", "a", false);
         exampleList.add("asdasdasd");
         exampleList.add("daaddd");
         exampleList.add("st");
@@ -44,9 +43,14 @@ public class FileManager {
     }
 
     public static List<String> readLines(String dest) {
-        ArrayList<String> lines = new ArrayList<>();
-        try {
-            Files.lines(Paths.get(dest)).forEach(lines::add);
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(dest))){
+            String line;
+            do {
+                line = reader.readLine();
+                lines.add(line);
+            } while (line != null);
+            lines = lines.subList(0, lines.size()-1);
         } catch (NoSuchFileException e) {
             throw new InvalidPathException("", "No file exists at " + dest);
         } catch (IOException e) {

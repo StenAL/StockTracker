@@ -10,6 +10,7 @@ import org.patriques.output.timeseries.data.StockData;
 import java.time.LocalDate;
 import java.util.*;
 
+//TODO: Refactor so there's no more writing to files
 class StockInfoFetcher {
 
     private static final String API_KEY = "NZ04YC2MOTE5AN4P";
@@ -20,22 +21,19 @@ class StockInfoFetcher {
     }
 
     private static void test() {
-        getData("AAPL", LocalDate.now().minusDays(35));
-        getData("IVV", LocalDate.now().minusDays(365));
-        getData("QQQ", LocalDate.now().minusDays(365));
+        FileManager.writeList(StockTracker.PATH + "AAPL_temp.csv", getData("AAPL", LocalDate.now().minusDays(35)));
+        FileManager.writeList(StockTracker.PATH + "IVV_temp.csv", getData("IVV", LocalDate.now().minusDays(365)));
+        FileManager.writeList(StockTracker.PATH + "QQQ_temp.csv", getData("QQQ", LocalDate.now().minusDays(365)));
     }
 
-    static void getData(String ticker, LocalDate startDate, double splitCoefficient) {
+    static List<String> getData(String ticker, LocalDate startDate, double splitCoefficient) {
         Map<String, String> data = fetchData(ticker, startDate, splitCoefficient);
-        writeData(data, ticker);
-
-        System.out.println("Fetcing " + ticker + " done");
+        return organizeData(data, ticker);
     }
 
-    static void getData(String ticker, LocalDate startDate) {
+    static List<String> getData(String ticker, LocalDate startDate) {
         Map<String, String> data = fetchData(ticker, startDate, 1);
-        writeData(data, ticker);
-        System.out.println("Fetcing " + ticker + " done");
+        return organizeData(data, ticker);
     }
 
     private static Map<String, String> fetchData(String ticker, LocalDate startDate, double splitCoefficient)
@@ -105,14 +103,15 @@ class StockInfoFetcher {
         return dateCloses;
     }
 
-    private static void writeData(Map<String, String> data, String ticker) {
-        List<String> writeList = new ArrayList<>();
+    private static List<String> organizeData(Map<String, String> data, String ticker) {
+        List<String> organizedData = new ArrayList<>();
         Object[] keyArray = data.keySet().toArray();
         Arrays.sort(keyArray);
         for (Object key: keyArray) {
-            writeList.add(key + "," + data.get((String) key));
+            organizedData.add(key + "," + data.get((String) key));
         }
-        FileManager.writeList(StockTracker.PATH + ticker + "_temp.csv", writeList);
+        System.out.println("Fetcing " + ticker + " done");
+        return organizedData;
     }
 
     static LocalDate getMostRecentDay() {

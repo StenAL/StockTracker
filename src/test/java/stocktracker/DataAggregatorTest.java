@@ -3,6 +3,7 @@ package stocktracker;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.time.LocalDate;
@@ -20,12 +21,6 @@ class DataAggregatorTest {
 
     @BeforeAll
     static void updateData() throws IOException {
-        StockInfoFetcher.getData("AAPL", LocalDate.now().minusDays(139));
-        StockInfoFetcher.getData("MSFT", LocalDate.now().minusDays(139));
-        CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(139));
-        DataAggregator.aggregateStock("AAPL", "USD");
-        DataAggregator.aggregateStock("MSFT", "USD");
-
         ArrayList<String> testList = new ArrayList<>();
         testList.add("AAPL");
         testList.add("MSFT");
@@ -38,7 +33,7 @@ class DataAggregatorTest {
 
     @Test
     void testInvalidData() {
-        assertThrows(InvalidPathException.class, () -> DataAggregator.aggregateStock("AAAPL", "USD"));
+        assertThrows(FileNotFoundException.class, () -> DataAggregator.aggregateStock("AAAPL", "USD"));
     }
 
     @Test

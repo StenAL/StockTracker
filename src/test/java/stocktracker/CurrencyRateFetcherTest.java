@@ -20,13 +20,13 @@ class CurrencyRateFetcherTest {
 
     @BeforeAll
     static void setUp() throws IOException {
-        CurrencyRateFetcher.writeCurrencyInfo("USD", LocalDate.now().minusDays(365));
+        CurrencyRateFetcher.getCurrencyInfo("USD", LocalDate.now().minusDays(365));
         dataList = FileManager.readLines(PATH + "USD_temp.csv");
     }
 
     @Test
     void testEuroFetching() throws IOException {
-        CurrencyRateFetcher.writeCurrencyInfo("EUR", LocalDate.now().minusDays(365));
+        CurrencyRateFetcher.getCurrencyInfo("EUR", LocalDate.now().minusDays(365));
         File dataFile = new File(PATH + "EUR_temp.csv");
         assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
         List<String> data = FileManager.readLines(PATH + "EUR_temp.csv");
@@ -38,7 +38,7 @@ class CurrencyRateFetcherTest {
     @Test
     void testInvalidCurrency() {
         assertThrows(FileNotFoundException.class, () -> CurrencyRateFetcher
-                .writeCurrencyInfo("USDD", LocalDate.now().minusDays(365)));
+                .getCurrencyInfo("USDD", LocalDate.now().minusDays(365)));
     }
 
     @Test
