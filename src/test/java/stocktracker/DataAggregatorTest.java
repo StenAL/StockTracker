@@ -15,75 +15,54 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DataAggregatorTest {
 
-    private static final String PATH = StockTracker.PATH;
-    private static List<String> dataList;
-    private static List<String> dividendDataList;
+    private static final String PATH = System.getProperty("user.dir") + "/src/test/resources/DataAggregatorTest/";
+    private static final List<String> testTickers = new ArrayList<>();
 
     @BeforeAll
-    static void updateData() throws IOException {
-        ArrayList<String> testList = new ArrayList<>();
-        testList.add("AAPL");
-        testList.add("MSFT");
-        ArrayList<Number> testAmounts = new ArrayList<>();
-        testAmounts.add(5);
-        testAmounts.add(10);
-        DataAggregator.calculateMoney(testList, testAmounts);
-        dataList = FileManager.readLines(PATH + "aggregated_temp.csv");
+    static void setUp() throws IOException {
+        StockTracker.PATH = PATH;
+        testTickers.add("AAPL");
+        testTickers.add("MSFT");
+        FileManager.writeList(PATH + "AAPL_currency_temp.csv", DataAggregator.aggregateStock("AAPL", "USD"));
+        FileManager.writeList(PATH + "MSFT_currency_temp.csv", DataAggregator.aggregateStock("MSFT", "USD"));
+
     }
 
     @Test
     void testInvalidData() {
-        assertThrows(FileNotFoundException.class, () -> DataAggregator.aggregateStock("AAAPL", "USD"));
+        assertThrows(Exception.class, () -> DataAggregator.aggregateStock("AAAPL", "USD"));
     }
 
     @Test
-    void testSingleAggregation() {
-        File dataFile = new File(PATH + "AAPL_currency_temp.csv");
-        assertTrue(dataFile.lastModified() > System.currentTimeMillis() - 120000);
-        List<String> data = FileManager.readLines(PATH + "AAPL_currency_temp.csv");
-        String line = data.get(new Random().nextInt(data.size() - 1));
-        assertTrue(data.size() > 80);
-        assertEquals(3, line.split(",").length);
-        assertDoesNotThrow(() -> LocalDate.parse(line.split(",")[0]));
+    void testSingleAggregation() throws IOException {
+        List<String> aaplReferenceList = FileManager.readLines(PATH + "AAPL_reference.csv");
+        assertEquals(aaplReferenceList, DataAggregator.aggregateStock("AAPL", "USD"));
+
+        List<String> msftReferenceList = FileManager.readLines(PATH + "MSFT_reference.csv");
+        assertEquals(msftReferenceList, DataAggregator.aggregateStock("MSFT", "USD"));
     }
 
-    @Nested
-    @DisplayName("compoundAggregation")
-    class compoundAggregate {
-        @Test
-        void testDataValidity() {
-            for (String entry : dataList) {
-                String[] splitEntry = entry.split(",");
-                assertEquals(splitEntry.length, 5);
-                assertDoesNotThrow(() -> LocalDate.parse(splitEntry[0]));
-            }
-        }
+    @Test
+    void testCompoundAggregation() {
+        ArrayList<Number> testAmounts = new ArrayList<>();
+        testAmounts.add(5);
+        testAmounts.add(10);
 
-        @Test
-        void testDataSize() {
-            assertTrue(dataList.size() > 80);
-        }
+        List<String> compoundReferenceList = FileManager.readLines(PATH + "aggregated_with_money_reference.csv");
+        assertEquals(compoundReferenceList, DataAggregator.calculateMoney(testTickers, testAmounts));
+    }
 
-        @Test
-        void testFetchingNewData() {
-            File dataFile = new File(PATH + "aggregated_temp.csv");
-            assertTrue(dataFile.lastModified() > System.currentTimeMillis() - 120000);
-        }
-
-        @Test
-        void testDividendAggregation() {
-            List<String> dividendDataList = FileManager.readLines(PATH + "dividends_aggregated_temp.csv");
-            if (dividendDataList.size() > 0) {
-                String[] dividendLine = dividendDataList.get(0).split(",");
-                assertTrue(dividendLine.length >= 3);
-                assertDoesNotThrow(() -> LocalDate.parse(dividendLine[0]));
-                assertDoesNotThrow(() -> Double.parseDouble(dividendLine[2]));
-            }
-        }
+    @Test
+    void testDividendAggregation() {
+        List<String> dividendReferenceList = FileManager.readLines(PATH + "dividends_aggregated_reference.csv");
+        assertEquals(dividendReferenceList, DataAggregator.aggregateDividends(testTickers));
     }
 
     @AfterAll
-    static void teardown() throws InterruptedException {
-        Thread.sleep(60000);
+    static void teardown() {
+        new File(PATH + "MSFT_currency_temp.csv").delete();
+        new File(PATH + "AAPL_currency_temp.csv").delete();
+        new File(PATH + "aggregated_temp.csv").delete();
+        new File(PATH + "dividends_aggregated_temp.csv").delete();
     }
 }

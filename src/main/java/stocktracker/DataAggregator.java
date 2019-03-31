@@ -51,7 +51,6 @@ class DataAggregator {
     private static void aggregateStocks(List<String> tickers) {
         List<String> data;
         try {
-            aggregateDividends(tickers);
             data = FileManager.readLines(StockTracker.PATH + tickers.get(0) + "_currency_temp.csv");
             for (int i = 1; i < tickers.size(); i++) {
                 List<String> fileLines = FileManager.readLines(StockTracker.PATH + tickers.get(i) + "_currency_temp.csv");
@@ -74,19 +73,18 @@ class DataAggregator {
      * holiday then we use the next available day's close value instead.
      */
     static List<String> aggregateStock(String ticker, String currency) throws IOException {
-        String workingDir = StockTracker.PATH;
         List<String> stockDates = new ArrayList<>();
         List<String> currencyDates = new ArrayList<>();
         List<String> aggregateDates = new ArrayList<>();
         List<String> missingDates = new ArrayList<>();
         List<String> currencyRates = new ArrayList<>();
         List<String> stockRates = new ArrayList<>();
-        for (String line: FileManager.readLines(workingDir + ticker + "_temp.csv")) {
+        for (String line: FileManager.readLines(StockTracker.PATH + ticker + "_temp.csv")) {
             stockDates.add(line.split(",")[0]);
             stockRates.add(line.split(",")[1]);
         }
 
-        for (String line: FileManager.readLines(workingDir + currency + "_temp.csv")) {
+        for (String line: FileManager.readLines(StockTracker.PATH + currency + "_temp.csv")) {
             currencyDates.add(line.split(",")[0]);
             currencyRates.add(line.split(",")[1]);
         }
@@ -128,29 +126,33 @@ class DataAggregator {
         return aggregatedList;
     }
 
-    private static void aggregateDividends(List<String> tickers) throws IOException {
+    public static List<String> aggregateDividends(List<String> tickers) {
         Map<String, String> data = new HashMap<>();
-        for (String ticker : tickers) {
-            String currencyCode = YahooFinance.get(ticker).getCurrency();
-            List<String> fileLines = FileManager.readLines(StockTracker.PATH + ticker + "_dividend_temp.csv");
-            for (String fileLine : fileLines) {
-                String date = fileLine.split(",")[0];
-                String dividend = fileLine.split(",")[1];
-                if (!data.containsKey(date)) {
-                    data.put(date, ticker + "," + dividend + "," + currencyCode);
-                } else {
-                    data.put(date, data.get(date) + "," + ticker + "," + dividend + "," + currencyCode);
+        try {
+            for (String ticker : tickers) {
+                String currencyCode = YahooFinance.get(ticker).getCurrency();
+                List<String> fileLines = FileManager.readLines(StockTracker.PATH + ticker + "_dividend_temp.csv");
+                for (String fileLine : fileLines) {
+                    String date = fileLine.split(",")[0];
+                    String dividend = fileLine.split(",")[1];
+                    if (!data.containsKey(date)) {
+                        data.put(date, ticker + "," + dividend + "," + currencyCode);
+                    } else {
+                        data.put(date, data.get(date) + "," + ticker + "," + dividend + "," + currencyCode);
 
+                    }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        List<String> writeList = new ArrayList<>();
+        List<String> aggregateList = new ArrayList<>();
         Object[] keyArray = data.keySet().toArray();
         Arrays.sort(keyArray);
         for (Object key: keyArray) {
-            writeList.add(key + "," + data.get(key));
+            aggregateList.add(key + "," + data.get(key));
         }
-        FileManager.writeList(StockTracker.PATH + "dividends_aggregated_temp.csv", writeList);
+        return aggregateList;
     }
 
     private static void fillMissingDates(List<String> datesList, List<String> ratesList, String date) {
