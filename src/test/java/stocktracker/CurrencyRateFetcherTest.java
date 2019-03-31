@@ -15,21 +15,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CurrencyRateFetcherTest {
 
-    private static final String PATH = StockTracker.PATH;
+    private static final String PATH = System.getProperty("user.dir") + "/src/test/resources/";
     private static List<String> dataList;
 
     @BeforeAll
     static void setUp() throws IOException {
-        CurrencyRateFetcher.getCurrencyInfo("USD", LocalDate.now().minusDays(365));
-        dataList = FileManager.readLines(PATH + "USD_temp.csv");
+        StockTracker.PATH = PATH;
+        dataList = CurrencyRateFetcher.getCurrencyInfo("USD", LocalDate.now().minusDays(365));
     }
 
     @Test
     void testEuroFetching() throws IOException {
-        CurrencyRateFetcher.getCurrencyInfo("EUR", LocalDate.now().minusDays(365));
-        File dataFile = new File(PATH + "EUR_temp.csv");
-        assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
-        List<String> data = FileManager.readLines(PATH + "EUR_temp.csv");
+        List<String> data = CurrencyRateFetcher.getCurrencyInfo("EUR", LocalDate.now().minusDays(365));
         String line = data.get(new Random().nextInt(data.size()-1));
         assertEquals("1.000", line.split(",")[1]);
         assertDoesNotThrow(() -> LocalDate.parse(line.split(",")[0]));
@@ -55,14 +52,8 @@ class CurrencyRateFetcherTest {
         assertTrue(dataList.size() > 200);
     }
 
-    @Test
-    void testFetchingNewData() {
-        File dataFile = new File(PATH + "USD_temp.csv");
-        assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
-    }
-
     @AfterAll
-    static void teardown() throws InterruptedException {
-        Thread.sleep(20000);
+    static void teardown()  {
+        new File(PATH + "USD_XML_temp.xml").delete();
     }
 }

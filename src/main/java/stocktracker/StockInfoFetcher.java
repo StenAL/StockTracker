@@ -10,7 +10,7 @@ import org.patriques.output.timeseries.data.StockData;
 import java.time.LocalDate;
 import java.util.*;
 
-//TODO: Refactor so there's no more writing to files
+//TODO: Refactor so there's no more writing to files -- done by making class not static?
 class StockInfoFetcher {
 
     private static final String API_KEY = "NZ04YC2MOTE5AN4P";

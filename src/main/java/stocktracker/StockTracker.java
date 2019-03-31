@@ -84,14 +84,14 @@ public class StockTracker {
     public static void updateData(String ticker, LocalDate startDate, double splitCoefficient) {
         try {
             List<String> stockData = StockInfoFetcher.getData(ticker, startDate, splitCoefficient);
-            FileManager.writeList(StockTracker.PATH + ticker + "_temp.csv", stockData);
+            FileManager.writeList(PATH + ticker + "_temp.csv", stockData);
 
             String currencyCode = YahooFinance.get(ticker).getCurrency();
             List<String> currencyData = CurrencyRateFetcher.getCurrencyInfo(currencyCode, startDate);
-            FileManager.writeList(StockTracker.PATH + currencyCode + "_temp.csv", currencyData);
+            FileManager.writeList(PATH + currencyCode + "_temp.csv", currencyData);
 
             List<String> aggregatedList =  DataAggregator.aggregateStock(ticker, currencyCode);
-            FileManager.writeList(StockTracker.PATH + ticker + "_currency_temp.csv", aggregatedList);
+            FileManager.writeList(PATH + ticker + "_currency_temp.csv", aggregatedList);
         } catch (AlphaVantageException e) {
             System.out.println("Invalid stock ticker '" + ticker + "'");
         } catch (IOException e) {
@@ -106,9 +106,9 @@ public class StockTracker {
      */
     public static void calculateMoney(List<String> tickers, List<Number> stockAmounts) {
         List<String> aggregatedDataList = DataAggregator.calculateMoney(tickers, stockAmounts);
-        FileManager.writeList(StockTracker.PATH + "aggregated_with_money_temp.csv", aggregatedDataList);
+        FileManager.writeList(PATH + "aggregated_with_money_temp.csv", aggregatedDataList);
         List<String> aggregatedDividendList = DataAggregator.aggregateDividends(tickers);
-        FileManager.writeList(StockTracker.PATH + "dividends_aggregated_temp.csv", aggregatedDividendList);
+        FileManager.writeList(PATH + "dividends_aggregated_temp.csv", aggregatedDividendList);
 
     }
 

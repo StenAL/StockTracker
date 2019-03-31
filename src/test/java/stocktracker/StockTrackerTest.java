@@ -1,6 +1,5 @@
 package stocktracker;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -17,10 +16,11 @@ class StockTrackerTest {
 
     private static ArrayList<String> testList;
     private static ArrayList<Number> testAmounts;
-    private static final String PATH = StockTracker.PATH;
+    private static final String PATH = System.getProperty("user.dir") + "/src/test/resources/StockTrackerTest/";
 
     @BeforeAll
     static void setup() {
+        StockTracker.PATH = PATH;
         testList = new ArrayList<>();
         testList.add("IVV");
         testList.add("QQQ");
@@ -42,8 +42,8 @@ class StockTrackerTest {
         StockTracker.createSave();
         System.out.println("Files aggregated, money calculated");
         System.out.println("Done");
+        assertEquals(FileManager.readLines(PATH + "save_config_reference.csv"), FileManager.readLines(PATH + "save_config.csv"));
         assertTrue(new File(PATH + "save_data.csv").exists());
-        assertTrue(new File(PATH + "save_config.csv").exists());
         assertFalse(StockTracker.updateSave());
         Thread.sleep(30000);
     }
@@ -53,6 +53,7 @@ class StockTrackerTest {
     void testUpdate() {
         List<String> originalData = FileManager.readLines(PATH + "save_data.csv");
         List<String> data = originalData.subList(0, originalData.size()-10);
+        data.forEach(System.out::println);
         FileManager.writeList(PATH + "save_data.csv", data);
         assertTrue(StockTracker.updateSave());
         assertEquals(FileManager.readLines(PATH + "save_data.csv"), originalData);
@@ -60,6 +61,19 @@ class StockTrackerTest {
 
     @AfterAll
     static void teardown() {
-        FileManager.deleteTempFiles(PATH);
+        new File(PATH + "aggregated_temp.csv").delete();
+        new File(PATH + "aggregated_with_money_temp.csv").delete();
+        new File(PATH + "dividends_aggregated_temp.csv").delete();
+        new File(PATH + "IVV_currency_temp.csv").delete();
+        new File(PATH + "IVV_dividend_temp.csv").delete();
+        new File(PATH + "IVV_temp.csv").delete();
+        new File(PATH + "QQQ_temp.csv").delete();
+        new File(PATH + "QQQ_dividend_temp.csv").delete();
+        new File(PATH + "QQQ_currency_temp.csv").delete();
+        new File(PATH + "save_data.csv").delete();
+        new File(PATH + "save_config.csv").delete();
+        new File(PATH + "save_dividends.csv").delete();
+        new File(PATH + "USD_temp.csv").delete();
+        new File(PATH + "USD_XML_temp.xml").delete();
     }
 }

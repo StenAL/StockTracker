@@ -3,20 +3,17 @@ package stocktracker;
 import org.junit.jupiter.api.*;
 import org.patriques.output.AlphaVantageException;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class StockInfoFetcherTest {
-    private static String PATH;
     private static List<String> dataList;
+
     @BeforeAll
-    static synchronized void updateData() {
-        StockInfoFetcher.getData("BRK-B", LocalDate.now().minusDays(139));
-        PATH = StockTracker.PATH;
-        dataList = FileManager.readLines(PATH + "BRK-B_temp.csv");
+    static void updateData() {
+        dataList = StockInfoFetcher.getData("BRK-B", LocalDate.now().minusDays(139));
     }
 
     @Nested
@@ -42,32 +39,6 @@ class StockInfoFetcherTest {
         void testDataSize() {
             assertTrue(dataList.size() > 80);
         }
-
-        @Test
-        void testFetchingNewData() {
-            File dataFile = new File(PATH + "BRK-B_temp.csv");
-            assertTrue(dataFile.lastModified() > System.currentTimeMillis()-120000);
-        }
-
-        @Test
-        void testConfig() {
-            File configFile = new File(PATH + "save_config.csv");
-            if (configFile.exists()) {
-                String[] config = FileManager.readLines(PATH + "save_config.csv").get(0).split(",");
-                assertDoesNotThrow(() -> Integer.parseInt(config[1]));
-                assertDoesNotThrow(() -> Double.parseDouble(config[2]));
-            }
-        }
-
-        @Test
-        void testDividends() {
-            List<String> dividendDataList = FileManager.readLines(PATH + "BRK-B_dividend_temp.csv");
-            if (dividendDataList.size() > 0) {
-                String[] dividendLine = dividendDataList.get(0).split(",");
-                assertDoesNotThrow(() -> LocalDate.parse(dividendLine[0]));
-                assertDoesNotThrow(() -> Double.parseDouble(dividendLine[1]));
-            }
-        }
     }
 
     @Test
@@ -80,6 +51,6 @@ class StockInfoFetcherTest {
 
     @AfterAll
     static void teardown() throws InterruptedException {
-        Thread.sleep(60000);
+        Thread.sleep(30000);
     }
 }
